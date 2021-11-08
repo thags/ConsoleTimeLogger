@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "ConsoleTimeLogger": {
+      "commandName": "Project",
+      "workingDirectory": "C:\\Users\\Tyler\\source\\repos\\ConsoleTimeLogger\\ConsoleTimeLogger"
+    }
+  }
+}
