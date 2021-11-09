@@ -8,11 +8,14 @@ namespace ConsoleTimeLogger
         public static string getDay()
         {
             DateTime today = DateTime.Today;
-            return today.ToString("ddMMyyyy");
+            return today.ToString("yyyyMMdd");
         }
-        static void InsertHours(int hours, Microsoft.Data.Sqlite.SqliteConnection connection)
+        static void InsertHours(Microsoft.Data.Sqlite.SqliteConnection connection)
         {
-            if(hours > 0)
+            Console.WriteLine("Input how many hours you would like to insert");
+            string numberInput = Console.ReadLine();
+            int hours = Convert.ToInt16(numberInput);
+            if (hours > 0)
             {
                 var transaction = connection.BeginTransaction();
                 var insertCmd = connection.CreateCommand();
@@ -20,21 +23,36 @@ namespace ConsoleTimeLogger
                 insertCmd.ExecuteNonQuery();
 
                 transaction.Commit();
+                Console.WriteLine($"Logged {hours} hours for {getDay()}");
+            }
+        }
+        static void DBSearch(Microsoft.Data.Sqlite.SqliteConnection connection)
+        {
+            Console.WriteLine("Input the day you want to search for in yyyyMMdd format");
+            string day = Console.ReadLine();
+            var selectCmd = connection.CreateCommand();
+            selectCmd.CommandText = $"SELECT * FROM time WHERE date = {day}";
+            using var reader = selectCmd.ExecuteReader();
+            while (reader.Read())
+            {
+                var key = reader.GetString(0);
+                var hours = reader.GetInt32(1);
+                var date = reader.GetString(2);
+                Console.WriteLine($"KeyID: {key}, Hours: {hours}, Date: {date}");
             }
         }
         static void Main(string[] args)
         {
             using var connection = new SqliteConnection("Data Source=time.db");
             connection.Open();
-            
-            Console.WriteLine(getDay());
 
             //try to create a table
             try
             {
                 var createTable = connection.CreateCommand();
-                createTable.CommandText = @"CREATE TABLE time(hours INT, 
-                                                          date DATE
+                createTable.CommandText = @"CREATE TABLE time(id INTEGER PRIMARY KEY,
+                                                                hours INTEGER, 
+                                                                date STRING
                                                                     );";
                 createTable.ExecuteNonQuery();
             }
@@ -43,41 +61,32 @@ namespace ConsoleTimeLogger
                 Console.WriteLine("Table already exists");
             }
 
+            //loop
             int userInput = 1;
             while (userInput != 0)
             {
                 Console.WriteLine("Input your command");
-                Console.WriteLine("0 to exit");
-                Console.WriteLine("Insert any number to add that many hours to todays coding time");
+                Console.WriteLine("0 to exit, I to insert hours, S to search");
                 string newInput = Console.ReadLine();
-                userInput = Convert.ToInt16(newInput);
-                InsertHours(userInput, connection);
-                
+                if(newInput == "0" || newInput == "O" || newInput == "o")
+                {
+                    userInput = 0;
+                }
+                else if(newInput == "I" || newInput == "i")
+                {
+                    InsertHours(connection);
+                }
+                else if(newInput == "S" || newInput == "s")
+                {
+                    DBSearch(connection);
+                    
+                }
+                Console.WriteLine("-------------------------------------");
+
+
             }
 
-
-            //insert records
             
-            /*
-            var transaction = connection.BeginTransaction();
-            var insertCmd = connection.CreateCommand();
-            insertCmd.CommandText = $"INSERT INTO time(hours, date) VALUES('1', {getDay()})";
-            insertCmd.ExecuteNonQuery();
-
-            transaction.Commit();
-            */
-
-            //read records
-            var selectCmd = connection.CreateCommand();
-            selectCmd.CommandText = $"SELECT * FROM time";
-            using var reader = selectCmd.ExecuteReader(); 
-            while (reader.Read())
-            {
-                var first = reader.GetString(0);
-                var second = reader.GetString(1);
-                Console.WriteLine(first);
-                Console.WriteLine(second);
-            }
         }
     }
 }
