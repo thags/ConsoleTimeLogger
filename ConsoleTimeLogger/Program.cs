@@ -62,7 +62,23 @@ namespace ConsoleTimeLogger
         }
         static void UpdateItem(Microsoft.Data.Sqlite.SqliteConnection connection)
         {
-            Console.WriteLine("Update coming soon");
+            Console.WriteLine("Input the ID of the item you wish to update");
+            string updateID = Console.ReadLine();
+            Console.WriteLine("Input the Hours it should be updated to");
+            string hoursUpdateInput = Console.ReadLine();
+            int hoursUpdate = Convert.ToInt16(hoursUpdateInput);
+            try
+            {
+                var transaction = connection.BeginTransaction();
+                var updateCmd = connection.CreateCommand();
+                updateCmd.CommandText = $"UPDATE time SET hours={hoursUpdate} WHERE id = {updateID}";
+                updateCmd.ExecuteNonQuery();
+                transaction.Commit();
+            }
+            catch
+            {
+                Console.WriteLine("Are you sure you inputted the correct ID?");
+            }
         }
         static void Main(string[] args)
         {
