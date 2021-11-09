@@ -106,32 +106,28 @@ namespace ConsoleTimeLogger
             {
                 Console.WriteLine("Input your command");
                 Console.WriteLine("0 to exit, I to insert hours, S to search, D to delete, U to update");
-                string newInput = Console.ReadLine().ToUpper();
+                string userInputCommand = Console.ReadLine().ToUpper();
                 Console.WriteLine("-------------------------------------");
-                if (newInput == "0" || newInput == "O")
+                switch (userInputCommand)
                 {
-                    userInput = 0;
-                }
-                else if(newInput == "I")
-                {
-                    InsertHours(connection);
-                }
-                else if(newInput == "S")
-                {
-                    DBSearch(connection);
-                    
-                }
-                else if(newInput == "D")
-                {
-                    DeleteItem(connection);
-                }
-                else if (newInput == "U")
-                {
-                    UpdateItem(connection);
-                }
-                else
-                {
-                    Console.WriteLine("Incorrect input, try again.");
+                    case ("0"):
+                        userInput = 0;
+                        break;
+                    case "I":
+                        InsertHours(connection);
+                        break;
+                    case "S":
+                        DBSearch(connection);
+                        break;
+                    case "D":
+                        DeleteItem(connection);
+                        break;
+                    case "U":
+                        UpdateItem(connection);
+                        break;
+                    default:
+                        Console.WriteLine("Incorrect input, try again.");
+                        break;
                 }
                 Console.WriteLine("-------------------------------------");
 
