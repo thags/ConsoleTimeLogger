@@ -41,6 +41,25 @@ namespace ConsoleTimeLogger
                 Console.WriteLine($"KeyID: {key}, Hours: {hours}, Date: {date}");
             }
         }
+        static void DeleteItem(Microsoft.Data.Sqlite.SqliteConnection connection)
+        {
+            Console.WriteLine("Input the ID of the item you wish to delete");
+            string deleteID = Console.ReadLine();
+            try
+            {
+                var transaction = connection.BeginTransaction();
+                var deleteCmd = connection.CreateCommand();
+                deleteCmd.CommandText = $"DELETE FROM time WHERE id = {deleteID}";
+                deleteCmd.ExecuteNonQuery();
+
+                transaction.Commit();
+            }
+            catch
+            {
+                Console.WriteLine("Are you sure you inputted the correct ID?");
+            }
+            
+        }
         static void Main(string[] args)
         {
             using var connection = new SqliteConnection("Data Source=time.db");
@@ -84,7 +103,7 @@ namespace ConsoleTimeLogger
                 }
                 else if(newInput == "D")
                 {
-                    Console.WriteLine("Delete function coming soon");
+                    DeleteItem(connection);
                 }
                 Console.WriteLine("-------------------------------------");
 
