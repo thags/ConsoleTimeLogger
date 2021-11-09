@@ -60,6 +60,10 @@ namespace ConsoleTimeLogger
             }
             
         }
+        static void UpdateItem(Microsoft.Data.Sqlite.SqliteConnection connection)
+        {
+            Console.WriteLine("Update coming soon");
+        }
         static void Main(string[] args)
         {
             using var connection = new SqliteConnection("Data Source=time.db");
@@ -85,7 +89,7 @@ namespace ConsoleTimeLogger
             while (userInput != 0)
             {
                 Console.WriteLine("Input your command");
-                Console.WriteLine("0 to exit, I to insert hours, S to search, D to delete");
+                Console.WriteLine("0 to exit, I to insert hours, S to search, D to delete, U to update");
                 string newInput = Console.ReadLine().ToUpper();
                 Console.WriteLine("-------------------------------------");
                 if (newInput == "0" || newInput == "O")
@@ -104,6 +108,14 @@ namespace ConsoleTimeLogger
                 else if(newInput == "D")
                 {
                     DeleteItem(connection);
+                }
+                else if (newInput == "U")
+                {
+                    UpdateItem(connection);
+                }
+                else
+                {
+                    Console.WriteLine("Incorrect input, try again.");
                 }
                 Console.WriteLine("-------------------------------------");
 
