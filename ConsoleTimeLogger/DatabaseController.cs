@@ -3,6 +3,7 @@ using Microsoft.Data.Sqlite;
 
 namespace ConsoleTimeLogger
 {
+    //no user input should be taken in this file, it should be passed in from elsewhere
     class DatabaseController
     {
         public class Edit
@@ -24,7 +25,7 @@ namespace ConsoleTimeLogger
                 }
             }
 
-            public static void addHours(SqliteConnection connection, int addHours, string day = null)
+            public static void AddHours(SqliteConnection connection, int addHours, string day = null)
             {
                 if (day == null)
                 {
@@ -92,42 +93,38 @@ namespace ConsoleTimeLogger
             return today.ToString("yyyyMMdd");
         }
 
-        
-
-        
-
-        public static void DeleteItem(SqliteConnection connection)
+        public class Delete
         {
-            Console.WriteLine("Input the ID of the item you wish to delete");
-            string deleteID = Console.ReadLine();
-            try
+            public static void DeleteItem(SqliteConnection connection, string deleteID)
             {
-                var transaction = connection.BeginTransaction();
-                var deleteCmd = connection.CreateCommand();
-                deleteCmd.CommandText = $"DELETE FROM time WHERE id = {deleteID}";
-                deleteCmd.ExecuteNonQuery();
+                try
+                {
+                    var transaction = connection.BeginTransaction();
+                    var deleteCmd = connection.CreateCommand();
+                    deleteCmd.CommandText = $"DELETE FROM time WHERE id = {deleteID}";
+                    deleteCmd.ExecuteNonQuery();
 
-                transaction.Commit();
-            }
-            catch
-            {
-                Console.WriteLine("Are you sure you inputted the correct ID?");
-            }
+                    transaction.Commit();
+                }
+                catch
+                {
+                    Console.WriteLine("Are you sure you inputted the correct ID?");
+                }
 
+            }
         }
 
-        public static void UpdateItem(SqliteConnection connection)
+        
+
+        
+
+        public static void UpdateItem(SqliteConnection connection, int hoursUpdate, string updateDate)
         {
-            Console.WriteLine("Input the ID of the item you wish to update");
-            string updateID = Console.ReadLine();
-            Console.WriteLine("Input the Hours it should be updated to");
-            string hoursUpdateInput = Console.ReadLine();
-            int hoursUpdate = Convert.ToInt16(hoursUpdateInput);
             try
             {
                 var transaction = connection.BeginTransaction();
                 var updateCmd = connection.CreateCommand();
-                updateCmd.CommandText = $"UPDATE time SET hours={hoursUpdate} WHERE id = {updateID}";
+                updateCmd.CommandText = $"UPDATE time SET hours={hoursUpdate} WHERE date = {updateDate}";
                 updateCmd.ExecuteNonQuery();
                 transaction.Commit();
             }

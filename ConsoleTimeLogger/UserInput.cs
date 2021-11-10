@@ -27,10 +27,10 @@ namespace ConsoleTimeLogger
                         ViewDB(connection, true);
                         break;
                     case "D":
-                        DatabaseController.DeleteItem(connection);
+                        UserDelete(connection);
                         break;
                     case "U":
-                        DatabaseController.UpdateItem(connection);
+                        UserUpdate(connection);
                         break;
                     case "V":
                         DatabaseController.View.ViewAll(connection);
@@ -53,10 +53,15 @@ namespace ConsoleTimeLogger
                     Console.WriteLine("Insert how many hours you want to add to today");
                     string userAddHoursInput = Console.ReadLine();
                     int addHours = Convert.ToInt32(userAddHoursInput);
-                    DatabaseController.Edit.addHours(connection, addHours);
+                    DatabaseController.Edit.AddHours(connection, addHours);
                     break;
                 case ("I"):
-                    DatabaseController.Edit.InsertHours(connection);
+                    Console.WriteLine("What day would you like to add to(Format of: yyyyMMdd)");
+                    string day = Console.ReadLine();
+                    Console.WriteLine("Insert how many hours you want to add to today");
+                    userAddHoursInput = Console.ReadLine();
+                    addHours = Convert.ToInt32(userAddHoursInput);
+                    DatabaseController.Edit.AddHours(connection, addHours, day);
                     break;
                 default:
                     Console.WriteLine("Incorrect Input");
@@ -64,6 +69,7 @@ namespace ConsoleTimeLogger
             }
         }
 
+        //I want to handle all user input here
         public static void ViewDB(SqliteConnection connection, bool requireInput=false)
         {
             DatabaseController.View.DBSearch(connection);
@@ -74,6 +80,27 @@ namespace ConsoleTimeLogger
                 day = Console.ReadLine();
             }
             DatabaseController.View.DBSearch(connection, day);
+        }
+
+        public static void UserDelete(SqliteConnection connection)
+        {
+            DatabaseController.View.ViewAll(connection);
+            Console.WriteLine("Input the ID of the item you wish to delete");
+            string deleteID = Console.ReadLine();
+            DatabaseController.Delete.DeleteItem(connection, deleteID);
+        }
+
+        public static void UserUpdate(SqliteConnection connection)
+        {
+            DatabaseController.View.ViewAll(connection);
+            Console.WriteLine("Which day would you like to update? (Enter in yyyyMMdd format)");
+            string updateDate = Console.ReadLine();
+            Console.WriteLine("Input the Hours it should be updated to");
+            string hoursUpdateInput = Console.ReadLine();
+            int hoursUpdate = Convert.ToInt16(hoursUpdateInput);
+            DatabaseController.UpdateItem(connection, hoursUpdate, updateDate);
+            Console.WriteLine("Updated Line:");
+            DatabaseController.View.DBSearch(connection, updateDate);
         }
     }
 }
