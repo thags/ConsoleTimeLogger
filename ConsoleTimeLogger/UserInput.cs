@@ -12,7 +12,7 @@ namespace ConsoleTimeLogger
             while (userInput != 0)
             {
                 Console.WriteLine("Input your command");
-                Console.WriteLine("0 to exit, A to add hours, S to search, D to delete, U to update");
+                Console.WriteLine("0 to exit, A to add hours, S to search, D to delete, U to update, V to view all");
                 string userInputCommand = Console.ReadLine().ToUpper();
                 Console.WriteLine("-------------------------------------");
                 switch (userInputCommand)
@@ -24,13 +24,16 @@ namespace ConsoleTimeLogger
                         InsertUserInput(connection);
                         break;
                     case "S":
-                        DatabaseController.DBSearch(connection);
+                        ViewDB(connection, true);
                         break;
                     case "D":
                         DatabaseController.DeleteItem(connection);
                         break;
                     case "U":
                         DatabaseController.UpdateItem(connection);
+                        break;
+                    case "V":
+                        DatabaseController.View.ViewAll(connection);
                         break;
                     default:
                         Console.WriteLine("Incorrect input, try again.");
@@ -50,15 +53,27 @@ namespace ConsoleTimeLogger
                     Console.WriteLine("Insert how many hours you want to add to today");
                     string userAddHoursInput = Console.ReadLine();
                     int addHours = Convert.ToInt32(userAddHoursInput);
-                    DatabaseController.addHours(connection, addHours);
+                    DatabaseController.Edit.addHours(connection, addHours);
                     break;
                 case ("I"):
-                    DatabaseController.InsertInto.InsertHours(connection);
+                    DatabaseController.Edit.InsertHours(connection);
                     break;
                 default:
                     Console.WriteLine("Incorrect Input");
                     break;
             }
+        }
+
+        public static void ViewDB(SqliteConnection connection, bool requireInput=false)
+        {
+            DatabaseController.View.DBSearch(connection);
+            string day = null;
+            if (requireInput)
+            {
+                Console.WriteLine("Which day would you like to search for? (Enter in yyyyMMdd format)");
+                day = Console.ReadLine();
+            }
+            DatabaseController.View.DBSearch(connection, day);
         }
     }
 }

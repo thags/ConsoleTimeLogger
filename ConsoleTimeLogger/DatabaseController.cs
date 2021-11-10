@@ -5,7 +5,7 @@ namespace ConsoleTimeLogger
 {
     class DatabaseController
     {
-        public class InsertInto
+        public class Edit
         {
             public static void InsertHours(SqliteConnection connection)
             {
@@ -23,53 +23,78 @@ namespace ConsoleTimeLogger
                     Console.WriteLine($"Logged {hours} hours for {GetDay()}");
                 }
             }
+
+            public static void addHours(SqliteConnection connection, int addHours, string day = null)
+            {
+                if (day == null)
+                {
+                    day = GetDay();
+                }
+
+                if (addHours > 0)
+                {
+
+                    try
+                    {
+                        var transaction = connection.BeginTransaction();
+                        var updateCmd = connection.CreateCommand();
+                        updateCmd.CommandText = $"UPDATE time SET hours=hours+{addHours} WHERE date = {day}";
+                        updateCmd.ExecuteNonQuery();
+                        transaction.Commit();
+                    }
+                    catch
+                    {
+                        Console.WriteLine("Are you sure you inputted the correct ID?");
+                    }
+                }
+            }
         }
+
+        public class View
+        {
+            public static void DBSearch(SqliteConnection connection, string day=null)
+            {
+                if (day == null)
+                {
+                    day = GetDay();
+                }
+
+                var selectCmd = connection.CreateCommand();
+                selectCmd.CommandText = $"SELECT * FROM time WHERE date = {day}";
+                using var reader = selectCmd.ExecuteReader();
+                while (reader.Read())
+                {
+                    var key = reader.GetString(0);
+                    var hours = reader.GetInt32(1);
+                    var date = reader.GetString(2);
+                    Console.WriteLine($"KeyID: {key}, Hours: {hours}, Date: {date}");
+                }
+            }
+
+            public static void ViewAll(SqliteConnection connection)
+            {
+                var selectCmd = connection.CreateCommand();
+                selectCmd.CommandText = $"SELECT * FROM time";
+                using var reader = selectCmd.ExecuteReader();
+                while (reader.Read())
+                {
+                    var key = reader.GetString(0);
+                    var hours = reader.GetInt32(1);
+                    var date = reader.GetString(2);
+                    Console.WriteLine($"KeyID: {key}, Hours: {hours}, Date: {date}");
+                }
+            }
+        }
+
         public static string GetDay()
         {
             DateTime today = DateTime.Today;
             return today.ToString("yyyyMMdd");
         }
 
-        public static void addHours(SqliteConnection connection, int addHours, string date = null)
-        {
-            if(date == null)
-            {
-                date = GetDay();
-            }
+        
 
-            if (addHours > 0)
-            {
-                
-                try
-                {
-                    var transaction = connection.BeginTransaction();
-                    var updateCmd = connection.CreateCommand();
-                    updateCmd.CommandText = $"UPDATE time SET hours=hours+{addHours} WHERE date = {date}";
-                    updateCmd.ExecuteNonQuery();
-                    transaction.Commit();
-                }
-                catch
-                {
-                    Console.WriteLine("Are you sure you inputted the correct ID?");
-                }
-            }
-        }
-
-        public static void DBSearch(SqliteConnection connection)
-        {
-            Console.WriteLine("Input the day you want to search for in yyyyMMdd format");
-            string day = Console.ReadLine();
-            var selectCmd = connection.CreateCommand();
-            selectCmd.CommandText = $"SELECT * FROM time WHERE date = {day}";
-            using var reader = selectCmd.ExecuteReader();
-            while (reader.Read())
-            {
-                var key = reader.GetString(0);
-                var hours = reader.GetInt32(1);
-                var date = reader.GetString(2);
-                Console.WriteLine($"KeyID: {key}, Hours: {hours}, Date: {date}");
-            }
-        }
+        
 
         public static void DeleteItem(SqliteConnection connection)
         {
