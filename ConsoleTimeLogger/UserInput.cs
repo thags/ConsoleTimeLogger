@@ -21,7 +21,7 @@ namespace ConsoleTimeLogger
                         userInput = 0;
                         break;
                     case "A":
-                        InsertUserInput(connection);
+                        AddOperationUserInput(connection);
                         break;
                     case "S":
                         ViewDB(connection, true);
@@ -43,25 +43,23 @@ namespace ConsoleTimeLogger
             }
         }
 
-        public static void InsertUserInput(SqliteConnection connection)
+        public static void AddOperationUserInput(SqliteConnection connection)
         {
             Console.WriteLine("T to add hours for today, or I to add hours to a different day");
             string userInput = Console.ReadLine().ToUpper();
             switch (userInput)
             {
                 case ("T"):
-                    Console.WriteLine("Insert how many hours you want to add to today");
-                    string userAddHoursInput = Console.ReadLine();
-                    int addHours = Convert.ToInt32(userAddHoursInput);
-                    DatabaseController.Edit.AddHours(connection, addHours);
+                    int addToday = GetUserInt("Insert how many hours you want to add to today: ");
+                    DatabaseController.Edit.AddHours(connection, addToday);
+                    DatabaseController.View.DBSearch(connection);
                     break;
                 case ("I"):
                     Console.WriteLine("What day would you like to add to(Format of: yyyyMMdd)");
                     string day = Console.ReadLine();
-                    Console.WriteLine("Insert how many hours you want to add to today");
-                    userAddHoursInput = Console.ReadLine();
-                    addHours = Convert.ToInt32(userAddHoursInput);
-                    DatabaseController.Edit.AddHours(connection, addHours, day);
+                    int addToDay = GetUserInt("Insert how many hours you want to add to that day: ");
+                    DatabaseController.Edit.AddHours(connection, addToDay, day);
+                    DatabaseController.View.DBSearch(connection, day);
                     break;
                 default:
                     Console.WriteLine("Incorrect Input");
@@ -69,7 +67,6 @@ namespace ConsoleTimeLogger
             }
         }
 
-        //I want to handle all user input here
         public static void ViewDB(SqliteConnection connection, bool requireInput=false)
         {
             DatabaseController.View.DBSearch(connection);
@@ -95,12 +92,39 @@ namespace ConsoleTimeLogger
             DatabaseController.View.ViewAll(connection);
             Console.WriteLine("Which day would you like to update? (Enter in yyyyMMdd format)");
             string updateDate = Console.ReadLine();
-            Console.WriteLine("Input the Hours it should be updated to");
-            string hoursUpdateInput = Console.ReadLine();
-            int hoursUpdate = Convert.ToInt16(hoursUpdateInput);
-            DatabaseController.UpdateItem(connection, hoursUpdate, updateDate);
+            int userResponse = GetUserInt("Input the hours it should be updated to: ");
+            DatabaseController.UpdateItem(connection, userResponse, updateDate);
             Console.WriteLine("Updated Line:");
             DatabaseController.View.DBSearch(connection, updateDate);
+
+
+        }
+        public static int GetUserInt(string message)
+        {
+            bool isNumber = false;
+            int attemptCounter = 0;
+            while (!isNumber)
+            {
+                Console.WriteLine(message);
+                string intInput = Console.ReadLine();
+                isNumber = int.TryParse(intInput, out int intOutput);
+                if (isNumber)
+                {
+                    return intOutput;
+                }
+                else if (attemptCounter > 5)
+                {
+                    Console.WriteLine("Too many incorrect inputs.");
+                    break;
+                }
+                else
+                {
+                    attemptCounter++;
+                    Console.WriteLine("Make sure to input a number");
+                    Console.WriteLine("Try Again");
+                }
+            }
+            return -1;
         }
     }
 }

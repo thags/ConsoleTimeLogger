@@ -120,18 +120,22 @@ namespace ConsoleTimeLogger
 
         public static void UpdateItem(SqliteConnection connection, int hoursUpdate, string updateDate)
         {
-            try
+            if (hoursUpdate >= 0)
             {
-                var transaction = connection.BeginTransaction();
-                var updateCmd = connection.CreateCommand();
-                updateCmd.CommandText = $"UPDATE time SET hours={hoursUpdate} WHERE date = {updateDate}";
-                updateCmd.ExecuteNonQuery();
-                transaction.Commit();
-            }
-            catch
-            {
-                Console.WriteLine("Are you sure you inputted the correct ID?");
+                try
+                {
+                    var transaction = connection.BeginTransaction();
+                    var updateCmd = connection.CreateCommand();
+                    updateCmd.CommandText = $"UPDATE time SET hours={hoursUpdate} WHERE date = {updateDate}";
+                    updateCmd.ExecuteNonQuery();
+                    transaction.Commit();
+                }
+                catch
+                {
+                    Console.WriteLine("Are you sure you inputted the correct ID?");
+                }
             }
         }
+
     }
 }
