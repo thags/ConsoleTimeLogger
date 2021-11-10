@@ -7,13 +7,10 @@ namespace ConsoleTimeLogger
     {
         static void Main(string[] args)
         {
-            using var connection = new SqliteConnection("Data Source=time.db");
-            connection.Open();
-
-            DatabaseManager.CreateTableIfNonExistent(connection);
-
-            UserInput.InputLoop(connection);
-
+            //var DB = new DatabaseManager("time.db");
+            var User = new User("time.db");
+            User.InputLoop();
+            //Console.WriteLine(DateTime.Now.Date.ToString("yyyy-MM-dd"));
         }
     }
 }
