@@ -17,7 +17,7 @@ namespace ConsoleTimeLogger
             {
                 this.DB.View();
                 Console.WriteLine("Input your command");
-                Console.WriteLine("0 to exit, A to add hours");
+                Console.WriteLine("0 to exit, A to add hours, D to Delete a date, I to insert a date, V to view all");
                 string userInputCommand = Console.ReadLine().ToUpper();
                 Console.WriteLine("-------------------------------------");
                 switch (userInputCommand)
@@ -26,8 +26,21 @@ namespace ConsoleTimeLogger
                         userWantsExit = true;
                         break;
                     case "A":
-                        int userInput = GetUserInt("Add how many hours?: ");
-                        this.DB.AddTo(userInput);
+                        int userHourInput = GetUserInt("Add how many hours?: ");
+                        this.DB.AddTo(userHourInput);
+                        break;
+                    case "D":
+                        Console.WriteLine("Which date? (yyyyMMdd)");
+                        this.DB.Delete(Console.ReadLine());
+                        break;
+                    case "I":
+                        Console.WriteLine("Which date? (yyyyMMdd)");
+                        string userDateInput = Console.ReadLine();
+                        userHourInput = GetUserInt($"How many hours did you code for {userDateInput}?");
+                        this.DB.InsertRow(userDateInput, userHourInput);
+                        break;
+                    case "V":
+                        this.DB.View("all");
                         break;
                     default:
                         Console.WriteLine("Incorrect input, try again.");

@@ -34,10 +34,22 @@ namespace ConsoleTimeLogger
         }
 
         //TODO: view a single specific date, or the last X days of dates
-        public void View()
+        public void View(string day=null)
         {
             var selectCmd = this.Connection.CreateCommand();
             selectCmd.CommandText = "SELECT * FROM time";
+            switch (day)
+            {
+                case null:
+                    selectCmd.CommandText = $"SELECT * FROM time WHERE date={this.todayDate}";
+                    break;
+                case "all":
+                    selectCmd.CommandText = $"SELECT * FROM time";
+                    break;
+                default:
+                    selectCmd.CommandText = $"SELECT * FROM time WHERE date={day}";
+                    break;
+            }
             using var reader = selectCmd.ExecuteReader();
             while (reader.Read())
             {
@@ -63,7 +75,7 @@ namespace ConsoleTimeLogger
             }
             catch
             {
-                Console.WriteLine("Are you sure you inputted the correct ID?");
+                Console.WriteLine("Are you sure you inputted the correct date?");
             }
         }
 
@@ -80,6 +92,20 @@ namespace ConsoleTimeLogger
             catch
             {
                 Console.WriteLine("Are you sure you inputted the correct ID?");
+            }
+        }
+
+        public void InsertRow(string day, int hours)
+        {
+            if (hours > 0)
+            {
+                var transaction = this.Connection.BeginTransaction();
+                var insertCmd = this.Connection.CreateCommand();
+                insertCmd.CommandText = $"INSERT INTO time(hours, date) VALUES({hours}, {day})";
+                insertCmd.ExecuteNonQuery();
+
+                transaction.Commit();
+                Console.WriteLine($"Created row for {day} with {hours} hour(s)");
             }
         }
     }
