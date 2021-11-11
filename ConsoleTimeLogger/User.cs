@@ -141,7 +141,7 @@ namespace ConsoleTimeLogger
                 attempts++;
                 if (attempts == 5)
                 {
-                    Console.WriteLine("Too many incorrect attemps");
+                    Console.WriteLine("Too many incorrect attempts");
                 }
                 else
                 {
