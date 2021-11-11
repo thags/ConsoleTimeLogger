@@ -19,12 +19,10 @@ namespace ConsoleTimeLogger
 
         public void CreateTableIfNonExistent()
         {
-            //we want to make sure that the DB has the proper table
+            //we want to make sure that the DB has the proper table and columns
             try
             {
                 var createTable = this.Connection.CreateCommand();
-                //TODO add a Year, Month, Day column instead of just a date column
-                //this will allow easier searching/filtering if added in the future
                 createTable.CommandText = @"CREATE TABLE time(id INTEGER PRIMARY KEY,
                                                                 hours LONG, 
                                                                 date LONG
@@ -37,7 +35,6 @@ namespace ConsoleTimeLogger
             }
         }
 
-        //TODO: view a single specific date, or the last X days of dates
         public void View(string selection=null)
         {
             var selectCmd = this.Connection.CreateCommand();
@@ -55,7 +52,6 @@ namespace ConsoleTimeLogger
                     //selectCmd.CommandText = $"SELECT * FROM time WHERE date={day}";
                     break;
             }
-            //TODO see if there is an easier/better way to read lines from the DB like this
             using var reader = selectCmd.ExecuteReader();
             while (reader.Read())
             {

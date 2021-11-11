@@ -75,6 +75,7 @@ namespace ConsoleTimeLogger
         private static long GetUserHours()
             //want to make sure the user inputs a number
             //and give them more than 1 attempt to do it
+            //but also limit the attempts so it does not continue forever
         {
             bool isTime = false;
             int attemptCounter = 0;
