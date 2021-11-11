@@ -16,7 +16,7 @@ namespace ConsoleTimeLogger
             bool userWantsExit = false;
             while (!userWantsExit)
             {
-                //this.DB.View();
+                this.DB.View();
                 Console.WriteLine("Input your command");
                 Console.WriteLine("0 to exit, U to update hours, D to Delete a date, I to insert a date, V to view all");
                 string userInputCommand = Console.ReadLine().ToUpper();
@@ -37,11 +37,11 @@ namespace ConsoleTimeLogger
                         }
                         break;
                     case "D":
-                        Console.WriteLine("Which date? (yyyy-MM-dd)");
-                        this.DB.Delete(Console.ReadLine());
+                        long userDateInput = GetUserDate();
+                        this.DB.Delete(userDateInput);
                         break;
                     case "I":
-                        long userDateInput = GetUserDate();
+                        userDateInput = GetUserDate();
                         userHourInput = GetUserHours();
                         if (userHourInput != -1)
                         {

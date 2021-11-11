@@ -87,7 +87,7 @@ namespace ConsoleTimeLogger
             }
         }
 
-        public void Delete(string day)
+        public void Delete(long day)
         {
             try
             {
