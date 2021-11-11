@@ -64,13 +64,8 @@ namespace ConsoleTimeLogger
                 Console.WriteLine($"Hours: {ParseHours(hours)}, Date: {ParseDate(date)}");
             }
         }
-        public void Update(long addHours, long day = -1)
+        public void Update(long addHours, long day)
         {
-            //TODO make this a switch and model it after the View method
-            if (day == -1)
-            {
-                day = GetTodayDate();
-            }
             try
             {
                 //TODO tell the user if the date they entered does not exist
@@ -115,13 +110,12 @@ namespace ConsoleTimeLogger
             insertCmd.ExecuteNonQuery();
 
             transaction.Commit();
-            Console.WriteLine($"Created row for {day} with {hoursInput} hour(s)");
         }
 
         private string ParseDate(string day)
         {
             DateTime dt = new DateTime(long.Parse(day));
-            return dt.ToString("yyyy-MM-dd");
+            return dt.ToString("MM-dd-yyyy");
         }
 
         private string ParseHours(string hours)

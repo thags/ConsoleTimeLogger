@@ -17,8 +17,14 @@ namespace ConsoleTimeLogger
             while (!userWantsExit)
             {
                 this.DB.View();
+                Console.WriteLine("-------------------------------------");
+                Console.WriteLine("-------------------------------------");
                 Console.WriteLine("Input your command");
-                Console.WriteLine("0 to exit, U to update hours, D to Delete a date, I to insert a date, V to view all");
+                Console.WriteLine("0 to exit");
+                Console.WriteLine("U to update hours");
+                Console.WriteLine("D to delete a date");
+                Console.WriteLine("I to insert a date");
+                Console.WriteLine("V to view all");
                 string userInputCommand = Console.ReadLine().ToUpper();
                 Console.WriteLine("-------------------------------------");
                 //TODO create a method to handle the userInput for getting the proper date
@@ -30,14 +36,15 @@ namespace ConsoleTimeLogger
                         userWantsExit = true;
                         break;
                     case "U":
+                        long userDateInput = GetUserDate();
                         long userHourInput = GetUserHours();
-                        if (userHourInput != -1)
+                        if (userHourInput != -1 && userDateInput != -1)
                         {
-                            this.DB.Update(userHourInput);
+                            this.DB.Update(userHourInput, userDateInput);
                         }
                         break;
                     case "D":
-                        long userDateInput = GetUserDate();
+                        userDateInput = GetUserDate();
                         this.DB.Delete(userDateInput);
                         break;
                     case "I":
@@ -56,6 +63,7 @@ namespace ConsoleTimeLogger
                         break;
                 }
                 Console.WriteLine("-------------------------------------");
+                
             }
         }
         private static long GetUserHours()
@@ -108,7 +116,7 @@ namespace ConsoleTimeLogger
         }
         private static long DateInput()
         {
-            Console.WriteLine("Input a date (format: dd-MM-yyyy) ");
+            Console.WriteLine("Input a date (format: MM-dd-yyyy) ");
             bool finished = false;
             int attempts = 0;
             while (!finished && attempts < 5 )
