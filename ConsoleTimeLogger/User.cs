@@ -48,6 +48,8 @@ namespace ConsoleTimeLogger
                         }
                         break;
                     case "D":
+                        this.DB.View("all");
+                        Console.WriteLine("\n");
                         userDateInput = GetUserDate();
                         this.DB.Delete(userDateInput);
                         break;
@@ -153,7 +155,7 @@ namespace ConsoleTimeLogger
                 }
                 else
                 {
-                    Console.WriteLine("Incorrect input, try again");
+                    Console.WriteLine("Incorrect input, try again (format: MM-dd-yyyy)");
                 }
             }
             return -1;
