@@ -102,8 +102,6 @@ namespace ConsoleTimeLogger
 
         public void InsertRow(long day, long hoursInput)
         {
-            Console.WriteLine(day);
-            Console.WriteLine(hoursInput);
             var transaction = this.Connection.BeginTransaction();
             var insertCmd = this.Connection.CreateCommand();
             insertCmd.CommandText = $"INSERT INTO time(hours, date) VALUES({hoursInput},{day})";

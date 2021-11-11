@@ -131,7 +131,9 @@ namespace ConsoleTimeLogger
             while (!finished && attempts < 5 )
             {
                 string userIn = Console.ReadLine();
-                finished = DateTime.TryParse(userIn, out DateTime result);
+                var culture = CultureInfo.CreateSpecificCulture("en-US");
+                var styles = DateTimeStyles.None;
+                finished = DateTime.TryParse(userIn, culture, styles, out DateTime result);
                 if (finished)
                 {
                     return result.Ticks;
