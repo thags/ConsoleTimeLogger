@@ -11,7 +11,7 @@ namespace ConsoleTimeLogger
         }
         public void InputLoop()
         {
-            //loop
+            //Maybe this loop should be in the Main program.cs instead of here?
             bool userWantsExit = false;
             while (!userWantsExit)
             {
@@ -20,6 +20,9 @@ namespace ConsoleTimeLogger
                 Console.WriteLine("0 to exit, A to add hours, D to Delete a date, I to insert a date, V to view all");
                 string userInputCommand = Console.ReadLine().ToUpper();
                 Console.WriteLine("-------------------------------------");
+                //TODO create a method to handle the userInput for getting the proper date
+                //That function can also verify if a currently used date has been entered
+                //which can be a good or bad thing depending on the function
                 switch (userInputCommand)
                 {
                     case ("0"):
@@ -50,6 +53,8 @@ namespace ConsoleTimeLogger
             }
         }
         private static int GetUserInt(string message)
+            //want to make sure the user inputs a number
+            //and give them more than 1 attempt to do it
         {
             bool isNumber = false;
             int attemptCounter = 0;
@@ -74,6 +79,7 @@ namespace ConsoleTimeLogger
                     Console.WriteLine("Try Again");
                 }
             }
+            //a return of -1 lets us know that there was an issue
             return -1;
         }
 
