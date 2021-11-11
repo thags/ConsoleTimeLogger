@@ -32,15 +32,18 @@ namespace ConsoleTimeLogger
                 //which can be a good or bad thing depending on the function
                 switch (userInputCommand)
                 {
-                    case ("0"):
+                    case "0":
                         userWantsExit = true;
                         break;
                     case "U":
                         long userDateInput = GetUserDate();
-                        long userHourInput = GetUserHours();
-                        if (userHourInput != -1 && userDateInput != -1)
+                        if (userDateInput != -1)
                         {
-                            this.DB.Update(userHourInput, userDateInput);
+                            long userHourInput = GetUserHours();
+                            if (userHourInput != -1)
+                            {
+                                this.DB.Update(userHourInput, userDateInput);
+                            }
                         }
                         break;
                     case "D":
@@ -49,10 +52,13 @@ namespace ConsoleTimeLogger
                         break;
                     case "I":
                         userDateInput = GetUserDate();
-                        userHourInput = GetUserHours();
-                        if (userHourInput != -1)
+                        if (userDateInput != -1)
                         {
-                            this.DB.InsertRow(userDateInput, userHourInput);
+                            long userHourInput = GetUserHours();
+                            if (userHourInput != -1)
+                            {
+                                this.DB.InsertRow(userDateInput, userHourInput);
+                            }
                         }
                         break;
                     case "V":
@@ -127,8 +133,15 @@ namespace ConsoleTimeLogger
                 {
                     return result.Ticks;
                 }
-                Console.WriteLine("Incorrect input, try again");
                 attempts++;
+                if (attempts == 5)
+                {
+                    Console.WriteLine("Too many incorrect attemps");
+                }
+                else
+                {
+                    Console.WriteLine("Incorrect input, try again");
+                }
             }
             return -1;
         }
