@@ -41,7 +41,7 @@ namespace ConsoleTimeLogger
                         this.DB.Delete(Console.ReadLine());
                         break;
                     case "I":
-                        string userDateInput = GetUserDate();
+                        long userDateInput = GetUserDate();
                         userHourInput = GetUserHours();
                         if (userHourInput != -1)
                         {
@@ -91,7 +91,7 @@ namespace ConsoleTimeLogger
             return -1;
         }
 
-        private static string GetUserDate()
+        private static long GetUserDate()
         {
             Console.WriteLine("T to choose todays date");
             Console.WriteLine("C to choose a different date");
@@ -106,7 +106,7 @@ namespace ConsoleTimeLogger
                    return GetUserDate();
             }
         }
-        private static string DateInput()
+        private static long DateInput()
         {
             Console.WriteLine("Input a date (format: dd-MM-yyyy) ");
             bool finished = false;
@@ -117,17 +117,17 @@ namespace ConsoleTimeLogger
                 finished = DateTime.TryParse(userIn, out DateTime result);
                 if (finished)
                 {
-                    return result.ToString("ddMMyyyy");
+                    return result.Ticks;
                 }
                 Console.WriteLine("Incorrect input, try again");
                 attempts++;
             }
-            return "false";
+            return -1;
         }
 
-        private static string GetTodayDate()
+        private static long GetTodayDate()
         {
-            return DateTime.Today.ToString("ddMMyyyy");
+            return DateTime.Today.Ticks;
         }
 
     }

@@ -12,9 +12,9 @@ namespace ConsoleTimeLogger
             this.Connection.Open();
             this.CreateTableIfNonExistent();
         }
-        private static string GetTodayDate()
+        private static long GetTodayDate()
         {
-            return DateTime.Today.ToString("dd-MM-yyyy");
+            return DateTime.Today.Ticks;
         }
 
         public void CreateTableIfNonExistent()
@@ -27,7 +27,7 @@ namespace ConsoleTimeLogger
                 //this will allow easier searching/filtering if added in the future
                 createTable.CommandText = @"CREATE TABLE time(id INTEGER PRIMARY KEY,
                                                                 hours LONG, 
-                                                                date TEXT
+                                                                date LONG
                                                                     );";
                 createTable.ExecuteNonQuery();
             }
@@ -38,11 +38,11 @@ namespace ConsoleTimeLogger
         }
 
         //TODO: view a single specific date, or the last X days of dates
-        public void View(string day=null)
+        public void View(string selection=null)
         {
             var selectCmd = this.Connection.CreateCommand();
             selectCmd.CommandText = "SELECT * FROM time";
-            switch (day)
+            switch (selection)
             {
                 case null:
                     Console.Write("Todays Entry: ");
@@ -52,7 +52,7 @@ namespace ConsoleTimeLogger
                     selectCmd.CommandText = $"SELECT * FROM time";
                     break;
                 default:
-                    selectCmd.CommandText = $"SELECT * FROM time WHERE date={day}";
+                    //selectCmd.CommandText = $"SELECT * FROM time WHERE date={day}";
                     break;
             }
             //TODO see if there is an easier/better way to read lines from the DB like this
@@ -61,13 +61,13 @@ namespace ConsoleTimeLogger
             {
                 var hours = reader.GetString(1);
                 var date = reader.GetString(2);
-                Console.WriteLine($"Hours: {hours}, Date: {date}");
+                Console.WriteLine($"Hours: {ParseHours(hours)}, Date: {ParseDate(date)}");
             }
         }
-        public void Update(long addHours, string day = null)
+        public void Update(long addHours, long day = -1)
         {
             //TODO make this a switch and model it after the View method
-            if (day == null)
+            if (day == -1)
             {
                 day = GetTodayDate();
             }
@@ -105,7 +105,7 @@ namespace ConsoleTimeLogger
             }
         }
 
-        public void InsertRow(string day, long hoursInput)
+        public void InsertRow(long day, long hoursInput)
         {
             Console.WriteLine(day);
             Console.WriteLine(hoursInput);
@@ -116,6 +116,18 @@ namespace ConsoleTimeLogger
 
             transaction.Commit();
             Console.WriteLine($"Created row for {day} with {hoursInput} hour(s)");
+        }
+
+        private string ParseDate(string day)
+        {
+            DateTime dt = new DateTime(long.Parse(day));
+            return dt.ToString("yyyy-MM-dd");
+        }
+
+        private string ParseHours(string hours)
+        {
+            TimeSpan ts = new TimeSpan(long.Parse(hours));
+            return ts.ToString("h\\:mm");
         }
     }
 }
