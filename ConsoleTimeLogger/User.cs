@@ -109,6 +109,7 @@ namespace ConsoleTimeLogger
         {
             Console.WriteLine("T to choose todays date");
             Console.WriteLine("C to choose a different date");
+            Console.WriteLine("0 to go back to the main menu");
             string UserChoice = Console.ReadLine().ToUpper();
             switch (UserChoice)
             {
@@ -116,6 +117,8 @@ namespace ConsoleTimeLogger
                     return GetTodayDate();
                 case "C":
                     return DateInput();
+                case "0":
+                    return -1;
                 default:
                    return GetUserDate();
             }
