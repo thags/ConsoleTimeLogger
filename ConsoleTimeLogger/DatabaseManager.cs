@@ -6,15 +6,15 @@ namespace ConsoleTimeLogger
     class DatabaseManager
     {
         private SqliteConnection Connection;
-        private string todayDate;
         public DatabaseManager(string fileName)
         {
             this.Connection = new SqliteConnection($"Data Source={fileName}");
             this.Connection.Open();
             this.CreateTableIfNonExistent();
-            //possibly this should be it's own function that is called each time
-            //instead of just at initialization
-            this.todayDate = DateTime.Now.Date.ToString("yyyyMMdd");
+        }
+        private static string GetTodayDate()
+        {
+            return DateTime.Today.ToString("dd-MM-yyyy");
         }
 
         public void CreateTableIfNonExistent()
@@ -26,8 +26,8 @@ namespace ConsoleTimeLogger
                 //TODO add a Year, Month, Day column instead of just a date column
                 //this will allow easier searching/filtering if added in the future
                 createTable.CommandText = @"CREATE TABLE time(id INTEGER PRIMARY KEY,
-                                                                hours INTEGER, 
-                                                                date STRING
+                                                                hours LONG, 
+                                                                date TEXT
                                                                     );";
                 createTable.ExecuteNonQuery();
             }
@@ -46,7 +46,7 @@ namespace ConsoleTimeLogger
             {
                 case null:
                     Console.Write("Todays Entry: ");
-                    selectCmd.CommandText = $"SELECT * FROM time WHERE date={this.todayDate}";
+                    selectCmd.CommandText = $"SELECT * FROM time WHERE date={GetTodayDate()}";
                     break;
                 case "all":
                     selectCmd.CommandText = $"SELECT * FROM time";
@@ -64,12 +64,12 @@ namespace ConsoleTimeLogger
                 Console.WriteLine($"Hours: {hours}, Date: {date}");
             }
         }
-        public void AddTo(int addHours, string day = null)
+        public void Update(long addHours, string day = null)
         {
             //TODO make this a switch and model it after the View method
             if (day == null)
             {
-                day = this.todayDate;
+                day = GetTodayDate();
             }
             try
             {
@@ -77,7 +77,7 @@ namespace ConsoleTimeLogger
                 //Maybe give them the chance to create it, if it does not exist?
                 var transaction = this.Connection.BeginTransaction();
                 var updateCmd = this.Connection.CreateCommand();
-                updateCmd.CommandText = $"UPDATE time SET hours=hours+{addHours} WHERE date = {day}";
+                updateCmd.CommandText = $"UPDATE time SET hours={addHours} WHERE date = {day}";
                 updateCmd.ExecuteNonQuery();
                 transaction.Commit();
             }
@@ -105,20 +105,17 @@ namespace ConsoleTimeLogger
             }
         }
 
-        public void InsertRow(string day, int hours)
+        public void InsertRow(string day, long hoursInput)
         {
-            //TODO make this insert a row for todays date if it does not already exist
-            //maybe it should be called each time the Add function is called
-            if (hours > 0)
-            {
-                var transaction = this.Connection.BeginTransaction();
-                var insertCmd = this.Connection.CreateCommand();
-                insertCmd.CommandText = $"INSERT INTO time(hours, date) VALUES({hours}, {day})";
-                insertCmd.ExecuteNonQuery();
+            Console.WriteLine(day);
+            Console.WriteLine(hoursInput);
+            var transaction = this.Connection.BeginTransaction();
+            var insertCmd = this.Connection.CreateCommand();
+            insertCmd.CommandText = $"INSERT INTO time(hours, date) VALUES({hoursInput},{day})";
+            insertCmd.ExecuteNonQuery();
 
-                transaction.Commit();
-                Console.WriteLine($"Created row for {day} with {hours} hour(s)");
-            }
+            transaction.Commit();
+            Console.WriteLine($"Created row for {day} with {hoursInput} hour(s)");
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 
 namespace ConsoleTimeLogger
 {
@@ -15,9 +16,9 @@ namespace ConsoleTimeLogger
             bool userWantsExit = false;
             while (!userWantsExit)
             {
-                this.DB.View();
+                //this.DB.View();
                 Console.WriteLine("Input your command");
-                Console.WriteLine("0 to exit, A to add hours, D to Delete a date, I to insert a date, V to view all");
+                Console.WriteLine("0 to exit, U to update hours, D to Delete a date, I to insert a date, V to view all");
                 string userInputCommand = Console.ReadLine().ToUpper();
                 Console.WriteLine("-------------------------------------");
                 //TODO create a method to handle the userInput for getting the proper date
@@ -28,19 +29,24 @@ namespace ConsoleTimeLogger
                     case ("0"):
                         userWantsExit = true;
                         break;
-                    case "A":
-                        int userHourInput = GetUserInt("Add how many hours?: ");
-                        this.DB.AddTo(userHourInput);
+                    case "U":
+                        long userHourInput = GetUserHours();
+                        if (userHourInput != -1)
+                        {
+                            this.DB.Update(userHourInput);
+                        }
                         break;
                     case "D":
-                        Console.WriteLine("Which date? (yyyyMMdd)");
+                        Console.WriteLine("Which date? (yyyy-MM-dd)");
                         this.DB.Delete(Console.ReadLine());
                         break;
                     case "I":
-                        Console.WriteLine("Which date? (yyyyMMdd)");
-                        string userDateInput = Console.ReadLine();
-                        userHourInput = GetUserInt($"How many hours did you code for {userDateInput}?");
-                        this.DB.InsertRow(userDateInput, userHourInput);
+                        string userDateInput = GetUserDate();
+                        userHourInput = GetUserHours();
+                        if (userHourInput != -1)
+                        {
+                            this.DB.InsertRow(userDateInput, userHourInput);
+                        }
                         break;
                     case "V":
                         this.DB.View("all");
@@ -52,20 +58,23 @@ namespace ConsoleTimeLogger
                 Console.WriteLine("-------------------------------------");
             }
         }
-        private static int GetUserInt(string message)
+        private static long GetUserHours()
             //want to make sure the user inputs a number
             //and give them more than 1 attempt to do it
         {
-            bool isNumber = false;
+            bool isTime = false;
             int attemptCounter = 0;
-            while (!isNumber)
+            while (!isTime)
             {
-                Console.WriteLine(message);
-                string intInput = Console.ReadLine();
-                isNumber = int.TryParse(intInput, out int intOutput);
-                if (isNumber)
+                Console.WriteLine("Input time (format: h:mm)");
+                string hourInput = Console.ReadLine();
+                isTime = TimeSpan.TryParseExact(hourInput, "h\\:mm", CultureInfo.InvariantCulture, out TimeSpan result);
+                TimeSpan minimumTime = new TimeSpan(0, 0, 0);
+                int inputCheck = result.CompareTo(minimumTime);
+                if (isTime && inputCheck >= 0 )
                 {
-                    return intOutput;
+                    long date = result.Ticks;
+                    return date;
                 }
                 else if (attemptCounter > 5)
                 {
@@ -75,12 +84,50 @@ namespace ConsoleTimeLogger
                 else
                 {
                     attemptCounter++;
-                    Console.WriteLine("Make sure to input a number");
+                    Console.WriteLine("Make sure to input a positive time in format h:mm");
                     Console.WriteLine("Try Again");
                 }
             }
-            //a return of -1 lets us know that there was an issue
             return -1;
+        }
+
+        private static string GetUserDate()
+        {
+            Console.WriteLine("T to choose todays date");
+            Console.WriteLine("C to choose a different date");
+            string UserChoice = Console.ReadLine().ToUpper();
+            switch (UserChoice)
+            {
+                case "T":
+                    return GetTodayDate();
+                case "C":
+                    return DateInput();
+                default:
+                   return GetUserDate();
+            }
+        }
+        private static string DateInput()
+        {
+            Console.WriteLine("Input a date (format: dd-MM-yyyy) ");
+            bool finished = false;
+            int attempts = 0;
+            while (!finished && attempts < 5 )
+            {
+                string userIn = Console.ReadLine();
+                finished = DateTime.TryParse(userIn, out DateTime result);
+                if (finished)
+                {
+                    return result.ToString("ddMMyyyy");
+                }
+                Console.WriteLine("Incorrect input, try again");
+                attempts++;
+            }
+            return "false";
+        }
+
+        private static string GetTodayDate()
+        {
+            return DateTime.Today.ToString("ddMMyyyy");
         }
 
     }
