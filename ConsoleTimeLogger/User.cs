@@ -18,15 +18,16 @@ namespace ConsoleTimeLogger
             {
                 this.DB.View();
                 Console.WriteLine("-------------------------------------");
-                Console.WriteLine("-------------------------------------");
                 Console.WriteLine("Input your command");
+                Console.WriteLine("\n");
                 Console.WriteLine("0 to exit");
                 Console.WriteLine("U to update hours");
                 Console.WriteLine("D to delete a date");
                 Console.WriteLine("I to insert a date");
                 Console.WriteLine("V to view all");
-                string userInputCommand = Console.ReadLine().ToUpper();
                 Console.WriteLine("-------------------------------------");
+                string userInputCommand = Console.ReadLine().ToUpper();
+                Console.Clear();
                 //TODO create a method to handle the userInput for getting the proper date
                 //That function can also verify if a currently used date has been entered
                 //which can be a good or bad thing depending on the function
@@ -63,6 +64,9 @@ namespace ConsoleTimeLogger
                         break;
                     case "V":
                         this.DB.View("all");
+                        Console.WriteLine("\n Press any key to go back to main menu...");
+                        Console.ReadLine();
+                        Console.Clear();
                         break;
                     default:
                         Console.WriteLine("Incorrect input, try again.");
@@ -83,6 +87,7 @@ namespace ConsoleTimeLogger
             {
                 Console.WriteLine("Input time (format: h:mm)");
                 string hourInput = Console.ReadLine();
+                Console.Clear();
                 isTime = TimeSpan.TryParseExact(hourInput, "h\\:mm", CultureInfo.InvariantCulture, out TimeSpan result);
                 TimeSpan minimumTime = new TimeSpan(0, 0, 0);
                 int inputCheck = result.CompareTo(minimumTime);
@@ -112,6 +117,7 @@ namespace ConsoleTimeLogger
             Console.WriteLine("C to choose a different date");
             Console.WriteLine("0 to go back to the main menu");
             string UserChoice = Console.ReadLine().ToUpper();
+            Console.Clear();
             switch (UserChoice)
             {
                 case "T":
@@ -132,6 +138,7 @@ namespace ConsoleTimeLogger
             while (!finished && attempts < 5 )
             {
                 string userIn = Console.ReadLine();
+                Console.Clear();
                 var culture = CultureInfo.CreateSpecificCulture("en-US");
                 var styles = DateTimeStyles.None;
                 finished = DateTime.TryParse(userIn, culture, styles, out DateTime result);
