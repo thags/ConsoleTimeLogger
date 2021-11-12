@@ -37,7 +37,7 @@ namespace ConsoleTimeLogger
             }
         }
 
-        public void View(string selection=null, int limit = 1)
+        public void View(string selection=null, int limit = 1, long specific = -1)
         {
             var selectCmd = this.Connection.CreateCommand();
             selectCmd.CommandText = "SELECT * FROM time";
@@ -52,6 +52,9 @@ namespace ConsoleTimeLogger
                     break;
                 case "limit":
                     selectCmd.CommandText = $"SELECT * FROM time ORDER BY date DESC LIMIT {limit}";
+                    break;
+                case "specific":
+                    selectCmd.CommandText = $"SELECT * FROM time WHERE date={specific}";
                     break;
                 default:
                     //selectCmd.CommandText = $"SELECT * FROM time WHERE date={day}";
@@ -110,12 +113,39 @@ namespace ConsoleTimeLogger
 
         public void InsertRow(long day, long hoursInput)
         {
-            var transaction = this.Connection.BeginTransaction();
-            var insertCmd = this.Connection.CreateCommand();
-            insertCmd.CommandText = $"INSERT INTO time(hours, date) VALUES({hoursInput},{day})";
-            insertCmd.ExecuteNonQuery();
+            bool rowDoesntExist = CheckRowDateDoesntExist(day);
+            if (rowDoesntExist)
+            {
+                var transaction = this.Connection.BeginTransaction();
+                var insertCmd = this.Connection.CreateCommand();
+                insertCmd.CommandText = $"INSERT INTO time(hours, date) VALUES({hoursInput},{day})";
+                insertCmd.ExecuteNonQuery();
 
-            transaction.Commit();
+                transaction.Commit();
+            }
+            else
+            {
+                Console.Clear();
+                this.View("specific", specific:day);
+                Console.WriteLine($"Your entered date of {ParseDate(day.ToString())} already exists");
+                Console.WriteLine("U to update this days entry to the time provided");
+                Console.WriteLine("0 or any other input to return to the main menu with no changes");
+                string choice = Console.ReadLine().ToUpper();
+                switch (choice)
+                {
+                    case "U":
+                        Update(hoursInput, day);
+                        View("specific", specific:day);
+                        Console.WriteLine("Entry has been updated");
+                        Console.WriteLine("Press any key to return to main menu");
+                        Console.ReadLine();
+                        break;
+                    default:
+                        break;
+                }
+                Console.Clear();
+            }
+            
         }
 
         private string ParseDate(string day)
@@ -128,6 +158,21 @@ namespace ConsoleTimeLogger
         {
             TimeSpan ts = new TimeSpan(long.Parse(hours));
             return ts.ToString("h\\:mm");
+        }
+
+        private bool CheckRowDateDoesntExist(long desiredInput)
+        {
+            var checkCmd = this.Connection.CreateCommand();
+            checkCmd.CommandText = $"SELECT COUNT(*) FROM time WHERE date = {desiredInput}";
+            long result = (long)checkCmd.ExecuteScalar();
+            if (result > 0)
+            {
+                return false;
+            }
+            else
+            {
+                return true;
+            }
         }
     }
 }

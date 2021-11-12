@@ -81,7 +81,7 @@ namespace ConsoleTimeLogger
             Console.WriteLine("Which view would you like?");
             Console.WriteLine("A to see all");
             Console.WriteLine("T to see just today");
-            Console.WriteLine("X to see a specific amount of the most recent rows");
+            Console.WriteLine("X to choose an amount of days to see");
             string UserChoice = Console.ReadLine().ToUpper();
             switch (UserChoice)
             {
