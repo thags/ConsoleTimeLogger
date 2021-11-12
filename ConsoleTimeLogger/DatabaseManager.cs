@@ -1,5 +1,7 @@
 ﻿using System;
 using Microsoft.Data.Sqlite;
+using ConsoleTableExt;
+using System.Collections.Generic;
 
 namespace ConsoleTimeLogger
 {
@@ -46,20 +48,23 @@ namespace ConsoleTimeLogger
                     selectCmd.CommandText = $"SELECT * FROM time WHERE date={GetTodayDate()}";
                     break;
                 case "all":
-                    selectCmd.CommandText = $"SELECT * FROM time ORDER BY date";
+                    selectCmd.CommandText = $"SELECT * FROM time ORDER BY date DESC";
                     break;
                 case "limit":
-                    selectCmd.CommandText = $"SELECT * FROM time ORDER BY date LIMIT {limit}";
+                    selectCmd.CommandText = $"SELECT * FROM time ORDER BY date DESC LIMIT {limit}";
                     break;
                 default:
                     //selectCmd.CommandText = $"SELECT * FROM time WHERE date={day}";
                     break;
             }
             using var reader = selectCmd.ExecuteReader();
+
             while (reader.Read())
             {
+                
                 var hours = reader.GetString(1);
                 var date = reader.GetString(2);
+
                 Console.WriteLine($"Hours: {ParseHours(hours)}, Date: {ParseDate(date)}");
             }
         }
