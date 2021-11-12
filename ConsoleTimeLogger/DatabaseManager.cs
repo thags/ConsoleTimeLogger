@@ -44,7 +44,7 @@ namespace ConsoleTimeLogger
             switch (selection)
             {
                 case null:
-                    Console.Write("Todays Entry: ");
+                    Console.WriteLine("Todays Entry: ");
                     selectCmd.CommandText = $"SELECT * FROM time WHERE date={GetTodayDate()}";
                     break;
                 case "all":
@@ -58,15 +58,19 @@ namespace ConsoleTimeLogger
                     break;
             }
             using var reader = selectCmd.ExecuteReader();
-
+            var tableData = new List<List<object>> { new List<object> { "Date", "Hours" } };
             while (reader.Read())
             {
                 
                 var hours = reader.GetString(1);
                 var date = reader.GetString(2);
-
-                Console.WriteLine($"Hours: {ParseHours(hours)}, Date: {ParseDate(date)}");
+                tableData.Add(new List<object>{ParseDate(date), ParseHours(hours)});
             }
+
+            ConsoleTableBuilder
+                .From(tableData)
+                .WithFormat(ConsoleTableBuilderFormat.Alternative)
+                .ExportAndWriteLine(TableAligntment.Left);
         }
         public void Update(long addHours, long day)
         {

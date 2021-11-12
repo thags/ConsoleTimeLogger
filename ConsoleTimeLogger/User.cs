@@ -16,7 +16,6 @@ namespace ConsoleTimeLogger
             bool userWantsExit = false;
             while (!userWantsExit)
             {
-                this.DB.View();
                 Console.WriteLine("-------------------------------------");
                 Console.WriteLine("Input your command");
                 Console.WriteLine("\n");
@@ -45,7 +44,7 @@ namespace ConsoleTimeLogger
                         }
                         break;
                     case "D":
-                        this.DB.View("all");
+                        this.DB.View("limit", 5);
                         Console.WriteLine("\n");
                         userDateInput = GetUserDate();
                         this.DB.Delete(userDateInput);
