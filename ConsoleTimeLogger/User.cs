@@ -6,9 +6,11 @@ namespace ConsoleTimeLogger
     class User
     {
         DatabaseManager DB;
+        Reports GetReports;
         public User(string dbFile)
         {
             this.DB = new DatabaseManager(dbFile);
+            this.GetReports = new Reports(dbFile);
         }
         public void InputLoop()
         {
