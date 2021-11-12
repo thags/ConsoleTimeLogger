@@ -24,13 +24,10 @@ namespace ConsoleTimeLogger
                 Console.WriteLine("U to update hours");
                 Console.WriteLine("D to delete a date");
                 Console.WriteLine("I to insert a date");
-                Console.WriteLine("V to view all");
+                Console.WriteLine("V to view data");
                 Console.WriteLine("-------------------------------------");
                 string userInputCommand = Console.ReadLine().ToUpper();
                 Console.Clear();
-                //TODO create a method to handle the userInput for getting the proper date
-                //That function can also verify if a currently used date has been entered
-                //which can be a good or bad thing depending on the function
                 switch (userInputCommand)
                 {
                     case "0":
@@ -65,7 +62,8 @@ namespace ConsoleTimeLogger
                         }
                         break;
                     case "V":
-                        this.DB.View("all");
+                        //this.DB.View("all");
+                        ViewSelect();
                         Console.WriteLine("\n Press any key to go back to main menu...");
                         Console.ReadLine();
                         Console.Clear();
@@ -77,6 +75,55 @@ namespace ConsoleTimeLogger
                 Console.WriteLine("-------------------------------------");
                 
             }
+        }
+        private void ViewSelect()
+        {
+            Console.Clear();
+            Console.WriteLine("Which view would you like?");
+            Console.WriteLine("A to see all");
+            Console.WriteLine("T to see just today");
+            Console.WriteLine("X to see a specific amount of the most recent rows");
+            string UserChoice = Console.ReadLine().ToUpper();
+            switch (UserChoice)
+            {
+                case "A":
+                    this.DB.View("all");
+                    break;
+                case "T":
+                    this.DB.View();
+                    break;
+                case "X":
+                    //get a user int input
+                    bool result = getUserInt(out int userInput);
+                    if (result)
+                    {
+                        this.DB.View("limit", userInput);
+                    }
+
+                    break;
+                default:
+                    ViewSelect();
+                    break;
+            }
+
+        }
+        private static bool getUserInt(out int result)
+        {
+            Console.Clear();
+            bool properInput = false;
+            while (!properInput)
+            {
+                Console.WriteLine("Input a number");
+                string userInput = Console.ReadLine();
+                properInput = int.TryParse(userInput, out int parseResult);
+                if (properInput == true)
+                {
+                    result = parseResult;
+                    return true;
+                }
+            }
+            result = -1;
+            return properInput;
         }
         private static long GetUserHours()
             //want to make sure the user inputs a number

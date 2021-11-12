@@ -35,7 +35,7 @@ namespace ConsoleTimeLogger
             }
         }
 
-        public void View(string selection=null)
+        public void View(string selection=null, int limit = 1)
         {
             var selectCmd = this.Connection.CreateCommand();
             selectCmd.CommandText = "SELECT * FROM time";
@@ -46,7 +46,10 @@ namespace ConsoleTimeLogger
                     selectCmd.CommandText = $"SELECT * FROM time WHERE date={GetTodayDate()}";
                     break;
                 case "all":
-                    selectCmd.CommandText = $"SELECT * FROM time";
+                    selectCmd.CommandText = $"SELECT * FROM time ORDER BY date";
+                    break;
+                case "limit":
+                    selectCmd.CommandText = $"SELECT * FROM time ORDER BY date LIMIT {limit}";
                     break;
                 default:
                     //selectCmd.CommandText = $"SELECT * FROM time WHERE date={day}";
