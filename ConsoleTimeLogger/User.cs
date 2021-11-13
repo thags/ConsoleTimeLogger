@@ -184,7 +184,7 @@ namespace ConsoleTimeLogger
                    return GetUserDate();
             }
         }
-        private static long DateInput()
+        public static long DateInput()
         {
             Console.WriteLine("Input a date (format: MM-dd-yyyy) ");
             bool finished = false;

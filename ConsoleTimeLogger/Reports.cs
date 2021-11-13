@@ -18,7 +18,12 @@ namespace ConsoleTimeLogger
         {
             Console.Clear();
             Console.WriteLine("Which report?");
-            Console.WriteLine("R for Hours from a start date to today");
+            Console.WriteLine("R to choose how many days ago to start from to Today");
+            Console.WriteLine("S to enter a specific date to start from to Today");
+            Console.WriteLine("A to see total of all days hours");
+            Console.WriteLine("B to choose a specific start and end date");
+            Console.WriteLine("M to choose total time of a specific month");
+            Console.WriteLine("0 to return to main menu");
 
             string userInput = Console.ReadLine().ToUpper();
             switch (userInput)
@@ -27,13 +32,66 @@ namespace ConsoleTimeLogger
                     bool correct = getUserInt(out double result);
                     if (correct)
                     {
+                        Console.Clear();
                         ReportXDays(result);
                     }
+                    UserInputWait();
+                    break;
+                case "S":
+                    long startDate = User.DateInput();
+                    if (startDate != -1)
+                    {
+                        Console.Clear();
+                        ReportFromDate(startDate);
+                    }
+                    UserInputWait();
+                    break;
+                case "A":
+                    Console.Clear();
+                    ReportAll();
+                    UserInputWait();
+                    break;
+                case "B":
+                    Console.Clear();
+                    Console.WriteLine("Input the starting date");
+                    long firstDate = User.DateInput();
+                    if (firstDate != -1)
+                    {
+                        Console.Clear();
+                        Console.WriteLine("Input the end date");
+                        long secondDate = User.DateInput();
+                        if (secondDate != -1)
+                        {
+                            ReportFromDate(firstDate, secondDate);
+                        }
+                        else
+                        {
+                            Console.Clear();
+                            Console.WriteLine("Incorrect date input, returning to main menu");
+                        }
+                    }
+                    else
+                    {
+                        Console.Clear();
+                        Console.WriteLine("Incorrect date input, returning to main menu");
+                    }
+                    UserInputWait();
+                    break;
+                case "0":
                     break;
                 default:
+                    Console.WriteLine("Un-recognized input. Press any key to return to reports menu");
+                    Console.ReadLine();
+                    PickReports();
                     break;
             }
 
+        }
+        private static void UserInputWait()
+        {
+            Console.WriteLine("\n Press any key to return to main menu");
+            Console.ReadLine();
+            Console.Clear();
         }
         private static long GetTodayDate()
         {
@@ -82,7 +140,64 @@ namespace ConsoleTimeLogger
             }
 
 
-            Console.WriteLine(ParseHours(totalHours.ToString()));
+            Console.WriteLine($"Total Hours between {ParseDate(startDate.ToString())} and {ParseDate(today.ToString())}: {ParseHours(totalHours.ToString())}");
+        }
+
+        private void ReportAll()
+        {
+            var selectCmd = this.Connection.CreateCommand();
+            selectCmd.CommandText = $"SELECT * FROM time";
+
+            using var reader = selectCmd.ExecuteReader();
+            long totalHours = 0;
+            while (reader.Read())
+            {
+
+                var hours = reader.GetString(1);
+                totalHours += long.Parse(hours);
+            }
+
+
+            Console.WriteLine($"All hours total: {ParseHours(totalHours.ToString())} hours");
+        }
+
+        private void ReportFromDate(long startDate)
+        {
+            long today = GetTodayDate();
+            var selectCmd = this.Connection.CreateCommand();
+            selectCmd.CommandText = $"SELECT * FROM time WHERE date <= {today} AND date >= {startDate}";
+
+            using var reader = selectCmd.ExecuteReader();
+            long totalHours = 0;
+            while (reader.Read())
+            {
+
+                var hours = reader.GetString(1);
+                var date = reader.GetString(2);
+                totalHours += long.Parse(hours);
+            }
+
+
+            Console.WriteLine($"Total hours from {ParseDate(startDate.ToString())} to Today: {ParseHours(totalHours.ToString())} hours");
+        }
+        private void ReportFromDate(long startDate, long endDate)
+        {
+            long today = GetTodayDate();
+            var selectCmd = this.Connection.CreateCommand();
+            selectCmd.CommandText = $"SELECT * FROM time WHERE date <= {endDate} AND date >= {startDate}";
+
+            using var reader = selectCmd.ExecuteReader();
+            long totalHours = 0;
+            while (reader.Read())
+            {
+
+                var hours = reader.GetString(1);
+                var date = reader.GetString(2);
+                totalHours += long.Parse(hours);
+            }
+
+
+            Console.WriteLine($"Total hours from {ParseDate(startDate.ToString())} to {ParseDate(endDate.ToString())}: {ParseHours(totalHours.ToString())} hours");
         }
         private string ParseDate(string day)
         {
