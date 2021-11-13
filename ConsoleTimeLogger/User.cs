@@ -26,6 +26,7 @@ namespace ConsoleTimeLogger
                 Console.WriteLine("D to delete a date");
                 Console.WriteLine("I to insert a date");
                 Console.WriteLine("V to view data");
+                Console.WriteLine("R to view reports");
                 Console.WriteLine("-------------------------------------");
                 string userInputCommand = Console.ReadLine().ToUpper();
                 Console.Clear();
@@ -68,6 +69,9 @@ namespace ConsoleTimeLogger
                         Console.WriteLine("\n Press any key to go back to main menu...");
                         Console.ReadLine();
                         Console.Clear();
+                        break;
+                    case "R":
+                        this.GetReports.PickReports();
                         break;
                     default:
                         Console.WriteLine("Incorrect input, try again.");
