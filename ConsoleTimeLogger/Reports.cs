@@ -2,7 +2,6 @@
 using Microsoft.Data.Sqlite;
 using ConsoleTableExt;
 using System.Collections.Generic;
-using System.Globalization;
 
 namespace ConsoleTimeLogger
 {
@@ -87,7 +86,7 @@ namespace ConsoleTimeLogger
                     break;
                 case "M":
                     Console.Clear();
-                    bool userMonthInput = GetUserMonthInput(out int monthChoice);
+                    bool userMonthInput = User.GetUserMonthInput(out int monthChoice);
                     if (userMonthInput)
                     {
                         ReportMonth(monthChoice);
@@ -107,66 +106,6 @@ namespace ConsoleTimeLogger
             }
 
         }
-        private void ReportMonth(int month)
-        {
-            DateTime firstDayOfMonth = new DateTime(DateTime.Now.Year, month, 1);
-            DateTime lastDayOfMonth = (firstDayOfMonth.AddMonths(1)).AddDays(-1);
-            this.ReportFromDate(firstDayOfMonth.Ticks, lastDayOfMonth.Ticks);
-        }
-        private static bool GetUserMonthInput(out int userInput)
-        {            
-            userInput = 0;
-            bool correctInput = false;
-            int attempts = 0;
-            while (!correctInput && attempts < 5)
-            {
-                Console.Clear();
-                Console.WriteLine("Input a month between 1-12");
-                attempts++;
-                bool parseInput = int.TryParse(Console.ReadLine(), out userInput);
-                if (parseInput && (userInput <= 12 && userInput >= 1))
-                {
-                    return true;
-                }
-                else if (attempts >= 5)
-                {
-                    Console.WriteLine("Too many incorrect attempts. Returning to main menu");
-                    break;
-                }
-                else
-                {
-                    Console.WriteLine($"Incorrect input, you input {userInput}");
-                    Console.WriteLine("Please enter the Month you wish to view in number form (1-12)");
-                    Console.WriteLine("Press any key to try again");
-                    Console.ReadLine();
-                }
-            }
-            return false;
-
-        }
-
-        private static void UserInputWait()
-        {
-            Console.WriteLine("\n Press any key to return to the menu");
-            Console.ReadLine();
-            Console.Clear();
-        }
-        private static long GetTodayDate()
-        {
-            return DateTime.Today.Ticks;
-        }
-
-
-        //this can be used to get the long ticks of whatever date comes 
-        // x days before today
-        private static long SubtractXDaysFromToday(double xDays)
-        {
-            DateTime today = new DateTime(GetTodayDate());
-            xDays *= -1;
-            DateTime XfromToday = today.AddDays(xDays);
-            return XfromToday.Ticks;
-        }
-
         private static void DisplayReportResults(List<List<object>> tableData)
         {
             ConsoleTableBuilder
@@ -174,11 +113,17 @@ namespace ConsoleTimeLogger
                .WithFormat(ConsoleTableBuilderFormat.Alternative)
                .ExportAndWriteLine(TableAligntment.Left);
         }
+        private void ReportMonth(int month)
+        {
+            DateTime firstDayOfMonth = new DateTime(DateTime.Now.Year, month, 1);
+            DateTime lastDayOfMonth = (firstDayOfMonth.AddMonths(1)).AddDays(-1);
+            this.ReportFromDate(firstDayOfMonth.Ticks, lastDayOfMonth.Ticks);
+        }
 
         private void ReportXDays(double xDays)
         {
             long startDate = SubtractXDaysFromToday(xDays);
-            long today = GetTodayDate();
+            long today = DatabaseManager.GetTodayDate();
             var selectCmd = this.Connection.CreateCommand();
             selectCmd.CommandText = $"SELECT * FROM time WHERE date <= {today} AND date >= {startDate}";
             var tableData = new List<List<object>> { new List<object> { "Start Date", "End Date", "Total Hours" } };
@@ -191,9 +136,16 @@ namespace ConsoleTimeLogger
                 var date = reader.GetString(2);
                 totalHours += long.Parse(hours);
             }
-            tableData.Add(new List<object> { ParseDate(startDate.ToString()), ParseDate(today.ToString()), ParseHours(totalHours.ToString()) });
+            tableData.Add(new List<object> { DatabaseManager.ParseDate(startDate.ToString()), 
+                DatabaseManager.ParseDate(today.ToString()), DatabaseManager.ParseHours(totalHours.ToString()) });
             DisplayReportResults(tableData);
-
+        }
+        private static long SubtractXDaysFromToday(double xDays)
+        {
+            DateTime today = new DateTime(DatabaseManager.GetTodayDate());
+            xDays *= -1;
+            DateTime XfromToday = today.AddDays(xDays);
+            return XfromToday.Ticks;
         }
 
         private void ReportAll()
@@ -217,13 +169,14 @@ namespace ConsoleTimeLogger
                 totalHours += long.Parse(hours);
             }
 
-            tableData.Add(new List<object> { ParseDate(firstDate.ToString()), ParseDate(lastDate.ToString()), ParseHours(totalHours.ToString()) });
+            tableData.Add(new List<object> { DatabaseManager.ParseDate(firstDate.ToString()),
+                DatabaseManager.ParseDate(lastDate.ToString()), DatabaseManager.ParseHours(totalHours.ToString()) });
             DisplayReportResults(tableData);
         }
 
         private void ReportFromDate(long startDate)
         {
-            long today = GetTodayDate();
+            long today = DatabaseManager.GetTodayDate();
             var selectCmd = this.Connection.CreateCommand();
             selectCmd.CommandText = $"SELECT * FROM time WHERE date <= {today} AND date >= {startDate}";
             var tableData = new List<List<object>> { new List<object> { "Start Date", "End Date", "Total Hours" } };
@@ -236,7 +189,8 @@ namespace ConsoleTimeLogger
                 var date = reader.GetString(2);
                 totalHours += long.Parse(hours);
             }
-            tableData.Add(new List<object> { ParseDate(startDate.ToString()), ParseDate(today.ToString()), ParseHours(totalHours.ToString()) });
+            tableData.Add(new List<object> { DatabaseManager.ParseDate(startDate.ToString()),
+                DatabaseManager.ParseDate(today.ToString()), DatabaseManager.ParseHours(totalHours.ToString()) });
             DisplayReportResults(tableData);
         }
         private void ReportFromDate(long startDate, long endDate)
@@ -253,48 +207,10 @@ namespace ConsoleTimeLogger
                 var date = reader.GetString(2);
                 totalHours += long.Parse(hours);
             }
-            tableData.Add(new List<object> { ParseDate(startDate.ToString()), ParseDate(endDate.ToString()), ParseHours(totalHours.ToString()) });
+            tableData.Add(new List<object> { DatabaseManager.ParseDate(startDate.ToString()),
+                DatabaseManager.ParseDate(endDate.ToString()), DatabaseManager.ParseHours(totalHours.ToString()) });
             DisplayReportResults(tableData);
 
-        }
-        private string ParseDate(string day)
-        {
-            DateTime dt = new DateTime(long.Parse(day));
-            return dt.ToString("MM-dd-yyyy");
-        }
-
-        private string ParseHours(string hours)
-        {
-            TimeSpan ts = new TimeSpan(long.Parse(hours));
-            return ts.ToString("h\\:mm");
-        }
-        private static long GetUserDate()
-        {
-            Console.WriteLine("Input a starting date (format: MM-dd-yyyy) ");
-            bool finished = false;
-            int attempts = 0;
-            while (!finished && attempts < 5)
-            {
-                string userIn = Console.ReadLine();
-                Console.Clear();
-                var culture = CultureInfo.CreateSpecificCulture("en-US");
-                var styles = DateTimeStyles.None;
-                finished = DateTime.TryParse(userIn, culture, styles, out DateTime result);
-                if (finished)
-                {
-                    return result.Ticks;
-                }
-                attempts++;
-                if (attempts == 5)
-                {
-                    Console.WriteLine("Too many incorrect attempts");
-                }
-                else
-                {
-                    Console.WriteLine("Incorrect input, try again (format: MM-dd-yyyy)");
-                }
-            }
-            return -1;
         }
         private static bool getUserInt(out double result)
         {
@@ -313,6 +229,12 @@ namespace ConsoleTimeLogger
             }
             result = -1;
             return properInput;
+        }
+        private static void UserInputWait()
+        {
+            Console.WriteLine("\n Press any key to return to the menu");
+            Console.ReadLine();
+            Console.Clear();
         }
     }
 }

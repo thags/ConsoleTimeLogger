@@ -14,10 +14,7 @@ namespace ConsoleTimeLogger
             this.Connection.Open();
             this.CreateTableIfNonExistent();
         }
-        private static long GetTodayDate()
-        {
-            return DateTime.Today.Ticks;
-        }
+        public static long GetTodayDate() => DateTime.Today.Ticks;
 
         public void CreateTableIfNonExistent()
         {
@@ -79,8 +76,6 @@ namespace ConsoleTimeLogger
         {
             try
             {
-                //TODO tell the user if the date they entered does not exist
-                //Maybe give them the chance to create it, if it does not exist?
                 var transaction = this.Connection.BeginTransaction();
                 var updateCmd = this.Connection.CreateCommand();
                 updateCmd.CommandText = $"UPDATE time SET hours={addHours} WHERE date = {day}";
@@ -97,8 +92,6 @@ namespace ConsoleTimeLogger
         {
             try
             {
-                //TODO tell the user if the day they entered does not exist
-                //do this by using a different checking function
                 var transaction = this.Connection.BeginTransaction();
                 var deleteCmd = this.Connection.CreateCommand();
                 deleteCmd.CommandText = $"DELETE FROM time WHERE date = {day}";
@@ -147,19 +140,6 @@ namespace ConsoleTimeLogger
             }
             
         }
-
-        private string ParseDate(string day)
-        {
-            DateTime dt = new DateTime(long.Parse(day));
-            return dt.ToString("MM-dd-yyyy");
-        }
-
-        private string ParseHours(string hours)
-        {
-            TimeSpan ts = new TimeSpan(long.Parse(hours));
-            return ts.ToString("h\\:mm");
-        }
-
         private bool CheckRowDateDoesntExist(long desiredInput)
         {
             var checkCmd = this.Connection.CreateCommand();
@@ -173,6 +153,16 @@ namespace ConsoleTimeLogger
             {
                 return true;
             }
+        }
+        public static string ParseDate(string day)
+        {
+            DateTime dt = new DateTime(long.Parse(day));
+            return dt.ToString("MM-dd-yyyy");
+        }
+        public static string ParseHours(string hours)
+        {
+            TimeSpan ts = new TimeSpan(long.Parse(hours));
+            return ts.ToString("h\\:mm");
         }
     }
 }
