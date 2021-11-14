@@ -77,6 +77,15 @@ namespace ConsoleTimeLogger
                     }
                     UserInputWait();
                     break;
+                case "M":
+                    Console.Clear();
+                    bool userMonthInput = GetUserMonthInput(out int monthChoice);
+                    if (userMonthInput)
+                    {
+                        ReportMonth(monthChoice);
+                    }
+                    UserInputWait();
+                    break;
                 case "0":
                     break;
                 default:
@@ -87,6 +96,44 @@ namespace ConsoleTimeLogger
             }
 
         }
+        private void ReportMonth(int month)
+        {
+            DateTime firstDayOfMonth = new DateTime(DateTime.Now.Year, month, 1);
+            DateTime lastDayOfMonth = (firstDayOfMonth.AddMonths(1)).AddDays(-1);
+            this.ReportFromDate(firstDayOfMonth.Ticks, lastDayOfMonth.Ticks);
+        }
+        private static bool GetUserMonthInput(out int userInput)
+        {            
+            userInput = 0;
+            bool correctInput = false;
+            int attempts = 0;
+            while (!correctInput && attempts < 5)
+            {
+                Console.Clear();
+                Console.WriteLine("Input a month between 1-12");
+                attempts++;
+                bool parseInput = int.TryParse(Console.ReadLine(), out userInput);
+                if (parseInput && (userInput <= 12 && userInput >= 1))
+                {
+                    return true;
+                }
+                else if (attempts >= 5)
+                {
+                    Console.WriteLine("Too many incorrect attempts. Returning to main menu");
+                    break;
+                }
+                else
+                {
+                    Console.WriteLine($"Incorrect input, you input {userInput}");
+                    Console.WriteLine("Please enter the Month you wish to view in number form (1-12)");
+                    Console.WriteLine("Press any key to try again");
+                    Console.ReadLine();
+                }
+            }
+            return false;
+
+        }
+
         private static void UserInputWait()
         {
             Console.WriteLine("\n Press any key to return to main menu");
@@ -98,19 +145,6 @@ namespace ConsoleTimeLogger
             return DateTime.Today.Ticks;
         }
 
-        //this should find the date to start from (returned in ticks)
-        //if you do not want to start from today
-        //example: Get amount of hours between 11-20-2020 and 12-15-2020
-        //With this input the end date(12-15-2020) and the subtract of x days to find 11-20-2020
-        private static long SubtractDates(long endDate, long subtract)
-        {
-            DateTime startDate = new DateTime(endDate);
-            DateTime subtractDate = new DateTime(subtract);
-            TimeSpan diff = startDate.Subtract(subtractDate);
-            DateTime finalDate = startDate.Subtract(diff);
-            return finalDate.Ticks;
-
-        }
 
         //this can be used to get the long ticks of whatever date comes 
         // x days before today
