@@ -23,7 +23,7 @@ Developed using C# and SQLite.
 
 * A console based UI where users can navigate by key presses
  
- 	![image](https://user-images.githubusercontent.com/15159720/141688100-ec6130da-33d6-4a30-ad3c-1d7f546da58a.png)
+ 	- ![image](https://user-images.githubusercontent.com/15159720/141688100-ec6130da-33d6-4a30-ad3c-1d7f546da58a.png)
 
 * CRUD DB functions
 
