@@ -20,10 +20,10 @@ namespace ConsoleTimeLogger
             Console.WriteLine("\n These reports will show total hours for the given dates");
             Console.WriteLine("\n Which report? \n");
             Console.WriteLine("R to start from X days ago");
-            Console.WriteLine("S to enter a specific starting date up to Today");
-            Console.WriteLine("A to see total of all time");
-            Console.WriteLine("B to choose a specific start and end date");
             Console.WriteLine("M to see the total of a given month");
+            Console.WriteLine("S to enter a specific starting date up to Today");
+            Console.WriteLine("B to choose a specific start and end date");
+            Console.WriteLine("A to see total of all time");
             Console.WriteLine("0 to return to main menu");
             Console.WriteLine("-------------------------------------");
 
