@@ -5,8 +5,8 @@ namespace ConsoleTimeLogger
 {
     class User
     {
-        DatabaseManager DB;
-        Reports GetReports;
+        readonly DatabaseManager DB;
+        readonly Reports GetReports;
         public User(string dbFile)
         {
             this.DB = new DatabaseManager(dbFile);
@@ -14,7 +14,6 @@ namespace ConsoleTimeLogger
         }
         public void InputLoop()
         {
-            //Maybe this loop should be in the Main program.cs instead of here?
             bool userWantsExit = false;
             while (!userWantsExit)
             {
@@ -115,8 +114,10 @@ namespace ConsoleTimeLogger
         public static long DateInput()
         {
             Console.WriteLine("Input a date (format: MM-dd-yyyy) ");
+
             bool finished = false;
             int attempts = 0;
+
             while (!finished && attempts < 5)
             {
                 string userIn = Console.ReadLine();
@@ -144,6 +145,7 @@ namespace ConsoleTimeLogger
         private static bool getUserInt(out int result)
         {
             Console.Clear();
+
             bool properInput = false;
             while (!properInput)
             {
@@ -164,6 +166,7 @@ namespace ConsoleTimeLogger
             Console.WriteLine("T to choose todays date");
             Console.WriteLine("C to choose a different date");
             Console.WriteLine("0 to go back to the main menu");
+
             string UserChoice = Console.ReadLine().ToUpper();
             Console.Clear();
             switch (UserChoice)
@@ -179,11 +182,48 @@ namespace ConsoleTimeLogger
             }
         }
 
+        public static bool GetUserYearInput(out int userYearInput)
+        {
+            userYearInput = 0;
+            bool correctInput = false;
+            int attempts = 0;
+
+            while (!correctInput && attempts < 5)
+            {
+                Console.Clear();
+                Console.WriteLine("Input a year in format yyyy");
+                attempts++;
+                string userYearInputString = Console.ReadLine();
+                int userInputLen = userYearInputString.Length;
+                bool parseInput = int.TryParse(userYearInputString, out userYearInput);
+
+                if (parseInput && userInputLen == 4 && 
+                    (userYearInput <= DateTime.Today.Year && userYearInput >= 1900))
+                {
+                    return true;
+                }
+                else if (attempts >= 5)
+                {
+                    Console.WriteLine("Too many incorrect attempts. Returning to main menu");
+                    break;
+                }
+                else
+                {
+                    Console.WriteLine($"Incorrect input, you input {userYearInputString}");
+                    Console.WriteLine("Please enter the Year you wish to view in a format of yyyy");
+                    Console.WriteLine("Year must be greater than the year 1900");
+                    Console.WriteLine("Press any key to try again");
+                    Console.ReadLine();
+                }
+            }
+            return false;
+        }
         public static bool GetUserMonthInput(out int userInput)
         {
             userInput = 0;
             bool correctInput = false;
             int attempts = 0;
+
             while (!correctInput && attempts < 5)
             {
                 Console.Clear();
@@ -243,6 +283,24 @@ namespace ConsoleTimeLogger
                 }
             }
             return -1;
+        }
+        public static bool getUserXDays(out double result)
+        {
+            Console.Clear();
+            bool properInput = false;
+            while (!properInput)
+            {
+                Console.WriteLine("How many days ago should the report start from?");
+                string userInput = Console.ReadLine();
+                properInput = double.TryParse(userInput, out double parseResult);
+                if (properInput == true)
+                {
+                    result = parseResult;
+                    return true;
+                }
+            }
+            result = -1;
+            return properInput;
         }
 
     }

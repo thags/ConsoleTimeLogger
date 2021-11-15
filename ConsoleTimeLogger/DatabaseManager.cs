@@ -7,7 +7,7 @@ namespace ConsoleTimeLogger
 {
     class DatabaseManager
     {
-        private SqliteConnection Connection;
+        readonly private SqliteConnection Connection;
         public DatabaseManager(string fileName)
         {
             this.Connection = new SqliteConnection($"Data Source={fileName}");
@@ -36,8 +36,10 @@ namespace ConsoleTimeLogger
 
         public void View(string selection=null, int limit = 1, long specific = -1)
         {
+            var tableData = new List<List<object>> { new List<object> { "Date", "Hours" } };
             var selectCmd = this.Connection.CreateCommand();
             selectCmd.CommandText = "SELECT * FROM time";
+
             switch (selection)
             {
                 case null:
@@ -57,8 +59,9 @@ namespace ConsoleTimeLogger
                     //selectCmd.CommandText = $"SELECT * FROM time WHERE date={day}";
                     break;
             }
+
             using var reader = selectCmd.ExecuteReader();
-            var tableData = new List<List<object>> { new List<object> { "Date", "Hours" } };
+            
             while (reader.Read())
             {
                 
@@ -78,6 +81,7 @@ namespace ConsoleTimeLogger
             {
                 var transaction = this.Connection.BeginTransaction();
                 var updateCmd = this.Connection.CreateCommand();
+
                 updateCmd.CommandText = $"UPDATE time SET hours={addHours} WHERE date = {day}";
                 updateCmd.ExecuteNonQuery();
                 transaction.Commit();
@@ -100,35 +104,39 @@ namespace ConsoleTimeLogger
             }
             catch
             {
-                Console.WriteLine("Are you sure you inputted the correct ID?");
+                Console.WriteLine("Are you sure you inputted the correct Date?");
             }
         }
 
         public void InsertRow(long day, long hoursInput)
         {
             bool rowDoesntExist = CheckRowDateDoesntExist(day);
+
             if (rowDoesntExist)
             {
                 var transaction = this.Connection.BeginTransaction();
                 var insertCmd = this.Connection.CreateCommand();
+
                 insertCmd.CommandText = $"INSERT INTO time(hours, date) VALUES({hoursInput},{day})";
                 insertCmd.ExecuteNonQuery();
-
                 transaction.Commit();
             }
             else
             {
                 Console.Clear();
                 this.View("specific", specific:day);
+
                 Console.WriteLine($"Your entered date of {ParseDate(day.ToString())} already exists");
                 Console.WriteLine("U to update this days entry to the time provided");
                 Console.WriteLine("0 or any other input to return to the main menu with no changes");
+
                 string choice = Console.ReadLine().ToUpper();
                 switch (choice)
                 {
                     case "U":
                         Update(hoursInput, day);
                         View("specific", specific:day);
+
                         Console.WriteLine("Entry has been updated");
                         Console.WriteLine("Press any key to return to main menu");
                         Console.ReadLine();

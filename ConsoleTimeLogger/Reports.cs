@@ -31,7 +31,7 @@ namespace ConsoleTimeLogger
             switch (userInput)
             {
                 case "R":
-                    bool correct = getUserInt(out double result);
+                    bool correct = User.getUserXDays(out double result);
                     if (correct)
                     {
                         Console.Clear();
@@ -86,10 +86,11 @@ namespace ConsoleTimeLogger
                     break;
                 case "M":
                     Console.Clear();
-                    bool userMonthInput = User.GetUserMonthInput(out int monthChoice);
-                    if (userMonthInput)
+                    bool getUserMonthInput = User.GetUserMonthInput(out int monthChoice);
+                    bool getUserYearInput = User.GetUserYearInput(out int yearChoice);
+                    if (getUserMonthInput && getUserYearInput)
                     {
-                        ReportMonth(monthChoice);
+                        ReportMonth(monthChoice, yearChoice);
                     }
                     UserInputWait();
                     PickReports();
@@ -113,10 +114,11 @@ namespace ConsoleTimeLogger
                .WithFormat(ConsoleTableBuilderFormat.Alternative)
                .ExportAndWriteLine(TableAligntment.Left);
         }
-        private void ReportMonth(int month)
+        private void ReportMonth(int month, int year)
         {
-            DateTime firstDayOfMonth = new DateTime(DateTime.Now.Year, month, 1);
+            DateTime firstDayOfMonth = new DateTime(year, month, 1);
             DateTime lastDayOfMonth = (firstDayOfMonth.AddMonths(1)).AddDays(-1);
+            Console.Clear();
             this.ReportFromDate(firstDayOfMonth.Ticks, lastDayOfMonth.Ticks);
         }
 
@@ -124,20 +126,23 @@ namespace ConsoleTimeLogger
         {
             long startDate = SubtractXDaysFromToday(xDays);
             long today = DatabaseManager.GetTodayDate();
+            long totalHours = 0;
+            var tableData = new List<List<object>> { new List<object> { "Start Date", "End Date", "Total Hours" } };
+
             var selectCmd = this.Connection.CreateCommand();
             selectCmd.CommandText = $"SELECT * FROM time WHERE date <= {today} AND date >= {startDate}";
-            var tableData = new List<List<object>> { new List<object> { "Start Date", "End Date", "Total Hours" } };
+
             using var reader = selectCmd.ExecuteReader();
-            long totalHours = 0;
+            
             while (reader.Read())
             {
-
                 var hours = reader.GetString(1);
-                var date = reader.GetString(2);
                 totalHours += long.Parse(hours);
             }
+
             tableData.Add(new List<object> { DatabaseManager.ParseDate(startDate.ToString()), 
                 DatabaseManager.ParseDate(today.ToString()), DatabaseManager.ParseHours(totalHours.ToString()) });
+            
             DisplayReportResults(tableData);
         }
         private static long SubtractXDaysFromToday(double xDays)
@@ -150,86 +155,75 @@ namespace ConsoleTimeLogger
 
         private void ReportAll()
         {
+            long totalHours = 0;
+            var tableData = new List<List<object>> { new List<object> { "Start Date", "End Date", "Total Hours" } };
+
             var firstDatecmd = this.Connection.CreateCommand();
             firstDatecmd.CommandText = $"SELECT MIN(date) from 'time'";
             long firstDate = (long)firstDatecmd.ExecuteScalar();
+
             var lastDatecmd = this.Connection.CreateCommand();
             lastDatecmd.CommandText = $"SELECT MAX(date) FROM 'time'";
             long lastDate = (long)lastDatecmd.ExecuteScalar();
 
             var selectCmd = this.Connection.CreateCommand();
             selectCmd.CommandText = $"SELECT * FROM time";
-            var tableData = new List<List<object>> { new List<object> { "Start Date", "End Date", "Total Hours" } };
             using var reader = selectCmd.ExecuteReader();
-            long totalHours = 0;
+            
             while (reader.Read())
             {
-
                 var hours = reader.GetString(1);
                 totalHours += long.Parse(hours);
             }
 
             tableData.Add(new List<object> { DatabaseManager.ParseDate(firstDate.ToString()),
                 DatabaseManager.ParseDate(lastDate.ToString()), DatabaseManager.ParseHours(totalHours.ToString()) });
+            
             DisplayReportResults(tableData);
         }
 
         private void ReportFromDate(long startDate)
         {
             long today = DatabaseManager.GetTodayDate();
+            var tableData = new List<List<object>> { new List<object> { "Start Date", "End Date", "Total Hours" } };
+            long totalHours = 0;
+
             var selectCmd = this.Connection.CreateCommand();
             selectCmd.CommandText = $"SELECT * FROM time WHERE date <= {today} AND date >= {startDate}";
-            var tableData = new List<List<object>> { new List<object> { "Start Date", "End Date", "Total Hours" } };
             using var reader = selectCmd.ExecuteReader();
-            long totalHours = 0;
+            
             while (reader.Read())
             {
-
                 var hours = reader.GetString(1);
-                var date = reader.GetString(2);
                 totalHours += long.Parse(hours);
             }
+
             tableData.Add(new List<object> { DatabaseManager.ParseDate(startDate.ToString()),
                 DatabaseManager.ParseDate(today.ToString()), DatabaseManager.ParseHours(totalHours.ToString()) });
+            
             DisplayReportResults(tableData);
         }
         private void ReportFromDate(long startDate, long endDate)
         {
+            long totalHours = 0;
+            var tableData = new List<List<object>> { new List<object> { "Start Date", "End Date", "Total Hours" } };
+
             var selectCmd = this.Connection.CreateCommand();
             selectCmd.CommandText = $"SELECT * FROM time WHERE date <= {endDate} AND date >= {startDate}";
-            var tableData = new List<List<object>> { new List<object> { "Start Date", "End Date", "Total Hours" } };
             using var reader = selectCmd.ExecuteReader();
-            long totalHours = 0;
+            
             while (reader.Read())
             {
-
                 var hours = reader.GetString(1);
-                var date = reader.GetString(2);
                 totalHours += long.Parse(hours);
             }
+
             tableData.Add(new List<object> { DatabaseManager.ParseDate(startDate.ToString()),
                 DatabaseManager.ParseDate(endDate.ToString()), DatabaseManager.ParseHours(totalHours.ToString()) });
+            
             DisplayReportResults(tableData);
-
         }
-        private static bool getUserInt(out double result)
-        {
-            Console.Clear();
-            bool properInput = false;
-            while (!properInput)
-            {
-                Console.WriteLine("How many days ago should the report start from?");
-                string userInput = Console.ReadLine();
-                properInput = double.TryParse(userInput, out double parseResult);
-                if (properInput == true)
-                {
-                    result = parseResult;
-                    return true;
-                }
-            }
-            result = -1;
-            return properInput;
-        }
+        
         private static void UserInputWait()
         {
             Console.WriteLine("\n Press any key to return to the menu");
