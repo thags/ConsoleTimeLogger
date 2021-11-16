@@ -62,7 +62,7 @@ Developed using C# and SQLite.
 
 
 # Resources Used
-- The help and advice of my mentor
+- The help and advice of my mentor [Cappuccinocodes](https://github.com/cappuccinocodes)
 - [Mosh C# for beginners youtube video](https://www.youtube.com/watch?v=gfkTfcpWqAY&list=PLTjRvDozrdlz3_FPXwb6lX_HoGXa09Yef)
 - [Zetcode to get the basics of SQLite with C#](https://zetcode.com/csharp/sqlite/)
 - [MS docs for setting up SQLite with C#](https://docs.microsoft.com/en-us/dotnet/standard/data/sqlite/?tabs=netcore-cli)
