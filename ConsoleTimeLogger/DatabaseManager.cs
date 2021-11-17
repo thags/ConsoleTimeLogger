@@ -170,7 +170,7 @@ namespace ConsoleTimeLogger
         public static string ParseHours(string hours)
         {
             TimeSpan ts = new TimeSpan(long.Parse(hours));
-            return ts.ToString("h\\:mm");
+            return ts.ToString("hh\\:mm");
         }
     }
 }

@@ -141,7 +141,7 @@ namespace ConsoleTimeLogger
             }
 
             tableData.Add(new List<object> { DatabaseManager.ParseDate(startDate.ToString()), 
-                DatabaseManager.ParseDate(today.ToString()), DatabaseManager.ParseHours(totalHours.ToString()) });
+                DatabaseManager.ParseDate(today.ToString()), ParseHours(totalHours) });
             
             DisplayReportResults(tableData);
         }
@@ -177,7 +177,7 @@ namespace ConsoleTimeLogger
             }
 
             tableData.Add(new List<object> { DatabaseManager.ParseDate(firstDate.ToString()),
-                DatabaseManager.ParseDate(lastDate.ToString()), DatabaseManager.ParseHours(totalHours.ToString()) });
+                DatabaseManager.ParseDate(lastDate.ToString()), ParseHours(totalHours) });
             
             DisplayReportResults(tableData);
         }
@@ -199,7 +199,7 @@ namespace ConsoleTimeLogger
             }
 
             tableData.Add(new List<object> { DatabaseManager.ParseDate(startDate.ToString()),
-                DatabaseManager.ParseDate(today.ToString()), DatabaseManager.ParseHours(totalHours.ToString()) });
+                DatabaseManager.ParseDate(today.ToString()), ParseHours(totalHours) });
             
             DisplayReportResults(tableData);
         }
@@ -219,7 +219,7 @@ namespace ConsoleTimeLogger
             }
 
             tableData.Add(new List<object> { DatabaseManager.ParseDate(startDate.ToString()),
-                DatabaseManager.ParseDate(endDate.ToString()), DatabaseManager.ParseHours(totalHours.ToString()) });
+                DatabaseManager.ParseDate(endDate.ToString()), ParseHours(totalHours) });
             
             DisplayReportResults(tableData);
         }
@@ -229,6 +229,16 @@ namespace ConsoleTimeLogger
             Console.WriteLine("\n Press any key to return to the menu");
             Console.ReadLine();
             Console.Clear();
+        }
+
+        public static string ParseHours(long hours)
+        {
+            TimeSpan ts = new TimeSpan(hours);
+            
+            return string.Format("{0}hr {1}mn {2}sec",
+                     (int)ts.TotalHours,
+                     ts.Minutes,
+                     ts.Seconds);
         }
     }
 }
