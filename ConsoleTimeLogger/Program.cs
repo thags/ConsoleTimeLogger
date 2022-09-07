@@ -1,6 +1,7 @@
 ﻿using System;
 using Microsoft.Data.Sqlite;
 
+// Test Comment Here
 namespace ConsoleTimeLogger
 {
     class Program
